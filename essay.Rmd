@@ -1,0 +1,107 @@
+---
+title: "Item Response Theory - Final Essay"
+date: \today
+author: "Marius Keute"
+output: bookdown::pdf_document2
+bibliography: refs.bib
+---
+
+\
+\
+\
+\
+**submitted to:**
+
+**Dr. Stefano Noventa**
+
+**University of Tübingen**
+\
+\
+\
+
+
+**submitted by:**
+
+**Marius Keute (QDS, 5991873)**
+
+
+\
+\
+\
+
+**Statutory Declaration:**
+I hereby declare that I composed the present paper independently and that I have used no other resources than those indicated. The text passages which are taken from other works in wording or meaning have been identified as such. I also declare that this work has not been partly or completely used in another examination.
+
+\newpage
+\newpage
+
+# Introduction
+
+# Data preparation
+
+The dataset consisted of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher were set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" were set to missing values. Of the remaining cases, 2295 (68.5%) reported gender "1" and 1053 (31.4%) reported gender "2". The SCS data contained at least one missing value for 133 cases.
+
+The pattern of missing SCS items is shown in Figure \@ref(fig:missing-plot). It can be seen that item Q9 was missing most often, though not by a large margin (Q9: 27 missing values, Q5: 13 missing values). It can be seen that the majority of cases with missing values (118 cases / 88.7%) had only a single item missing, while there were no prominent patterns of items that tended to be jointly missing. Eight cases where more than two SCS items were missing were excluded from all further analyses. For the remaining 3368 cases, the probability of missing values at each SCS variable was modeled as a function of the values in all other SCS variables using a logistic regression model: $P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta})$, where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$, $X_{i,\not q}$ denotes the item values of all other items, $\sigma$ is the logistic function, and $\hat{\beta}$ are the estimated regression weights (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since those cases were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
+
+
+```{r missing-plot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
+source("analysis.R")
+knitr::include_graphics("missingplot.pdf")
+``` 
+
+For dichotomization of the item data, I considered two options, namely, thresholding each of the 10 items at its own median, to ensure an even distribution of observations into both categories for each item, or finding a common threshold for all items. Since the items have only four levels each, a median split would not necessarily lead to a very balanced dichotomization. Furthermore, the item levels are designed to have the same meaning across all items, therefore I decided to dichotomize at a common threshold of 2, i.e., the dichotomous items $D_q \in \{D_1, D_2, ..., D_{10}\}$ were defined such that 
+
+```{=latex}
+$$
+D_{i,q} = \begin{cases}
+0 \text{ if } Q_{i,q} \in \{1,2\},\\
+1 \text{ if } Q_{i,q} \in \{3,4\},\\
+
+\end{cases}
+$$
+```
+
+The distribution of the dichotomized items is shown in \@ref(tab:dichdistrotab) Since most variables' median was 2, this was not much different from an item-wise median threshold (see \@ref(tab:descriptivestab)). Subsequently, I calculated biserial correlations between all pairs of dichotomized items. Moreover, I calculated item discrimination, i.e., each items ability to discriminate between high- and low-scoring individuals, using the adjusted item-total correlation method (@reynolds2021mastering), i.e., by calculating biserial correlation coefficients between each (dichotomized) item's scores and the sum of all other (dichotomized) items.
+
+#TODO make tables smaller (too wide)
+#TODO make captions and table referencing work
+
+Next, I estimated a Rasch model using three different software implementations.
+
+The Rasch model...
+
+The first method was the one implemented in the R package `eRm` (@mair2007extended) 
+
+The second method was `lme4` (@doran2007estimating)
+
+The thirs method was `lavaan` (@rosseel2012lavaan, @templin2022IRT)
+
+# Results
+Descriptive characteristics of the 10 SCS items are shown in \@ref(tab:descriptivestab), the proportions of 'correct' responses, i.e., responses greater than 2, are shown in \@ref(tab:dichdistrotab).
+
+Item intercorrelations are shown in Figure \@ref(fig:biserialcorplot)
+#TODO discuss
+
+```{r descriptivestab, echo=FALSE}
+knitr::kable(descriptives, caption = "Descriptive item statistics (mean, median and range before dichotomization)")
+```
+
+```{r dichdistrotab, echo=FALSE}
+knitr::kable(dich.stats, caption = "Distribution and discrimination of dichotomized items")
+```
+
+```{r biserialcorplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
+knitr::include_graphics("biserial_cor_mat.pdf")
+``` 
+
+
+
+
+
+\newpage
+# References
+
+<div id="refs"></div>
+
+
+
