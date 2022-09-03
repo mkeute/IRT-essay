@@ -39,7 +39,7 @@ I hereby declare that I composed the present paper independently and that I have
 
 # Data preparation
 
-The dataset consisted of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher were set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" were set to missing values. Of the remaining cases, 2295 (68.5%) reported gender "1" and 1053 (31.4%) reported gender "2". The SCS data contained at least one missing value for 133 cases.
+The dataset (@kalichman1995sexual) consisted of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher were set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" were set to missing values. Of the remaining cases, 2295 (68.5%) reported gender "1" and 1053 (31.4%) reported gender "2". The SCS data contained at least one missing value for 133 cases.
 
 The pattern of missing SCS items is shown in Figure \@ref(fig:missing-plot). It can be seen that item Q9 was missing most often, though not by a large margin (Q9: 27 missing values, Q5: 13 missing values). It can be seen that the majority of cases with missing values (118 cases / 88.7%) had only a single item missing, while there were no prominent patterns of items that tended to be jointly missing. Eight cases where more than two SCS items were missing were excluded from all further analyses. For the remaining 3368 cases, the probability of missing values at each SCS variable was modeled as a function of the values in all other SCS variables using a logistic regression model: $P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta})$, where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$, $X_{i,\not q}$ denotes the item values of all other items, $\sigma$ is the logistic function, and $\hat{\beta}$ are the estimated regression weights (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since those cases were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
 
@@ -66,37 +66,58 @@ The distribution of the dichotomized items is shown in \@ref(tab:dichdistrotab) 
 #TODO make tables smaller (too wide)
 #TODO make captions and table referencing work
 
-Next, I estimated a Rasch model using three different software implementations.
-
-The Rasch model...
-
-The first method was the one implemented in the R package `eRm` (@mair2007extended) 
-
-The second method was `lme4` (@doran2007estimating)
-
-The thirs method was `lavaan` (@rosseel2012lavaan, @templin2022IRT)
-
-# Results
 Descriptive characteristics of the 10 SCS items are shown in \@ref(tab:descriptivestab), the proportions of 'correct' responses, i.e., responses greater than 2, are shown in \@ref(tab:dichdistrotab).
 
-Item intercorrelations are shown in Figure \@ref(fig:biserialcorplot)
-#TODO discuss
+
 
 ```{r descriptivestab, echo=FALSE}
 knitr::kable(descriptives, caption = "Descriptive item statistics (mean, median and range before dichotomization)")
 ```
-
 ```{r dichdistrotab, echo=FALSE}
 knitr::kable(dich.stats, caption = "Distribution and discrimination of dichotomized items")
 ```
-
+Item intercorrelations are shown in Figure \@ref(fig:biserialcorplot)
+#TODO discuss
 ```{r biserialcorplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
 knitr::include_graphics("biserial_cor_mat.pdf")
 ``` 
 
+# IRT modeling
+
+## Rasch model estimation
+Next, I estimated a Rasch model for the SCS data using three different software implementations. The Rasch model is also known as 1-parameter logistic model. It models a given person's chances of solving a given item as a logistic function of the difference between the $i^{th}$ item's difficulty $\beta_i$ and the $s^{th}$ person's ability $\theta_s$, where $\beta_i$ and $\theta_s$ are latent (unobserved) quantities that are estimated from the dichotomous (solved vs. not solved) item data.
+
+The first method was the one implemented in the R package `eRm` (@mair2007extended) 
+
+The second method was a generalized linear mixed regression model with a logistic link function as implemented in `lme4` (@bateslme4). `lme4` is a popular `R` package for fitting linear and generalized linear mixed-effects models, and as such it can be used to estimate the Rasch model, which is in essence a multilevel logistic regression model (@doran2007estimating).
+
+#discuss items as random or fixed effect
+
+The third method was `lavaan` (@rosseel2012lavaan, @templin2022IRT)
+
+## Model analysis
+
+ICC curves
+Fit indices
+
+## Alternative models
+
+# Data Dimensionality
+
+# Reliability and Measurement Invariance
+
+# Theoretical Exercise
+## Assumptions and Limits of IRT models
 
 
 
+
+
+\newpage
+# Analysis code
+In the following, the complete analysis code and its output are shown.
+```{r, code = readLines("analysis.R")}
+```
 
 \newpage
 # References

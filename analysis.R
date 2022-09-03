@@ -114,15 +114,14 @@ dich$score = rowSums(dich[,1:10])
 
 
 #####
-#part 2a: estimate Rasch model
+#part 2: estimate Rasch model
 #####
 {
   #approach 1: eRm
   #prepare data for eRm estimation
   #(just item data in wide format)
   data_for_eRm = dich[,1:10]
-  rasch_model_1 = RM(data_for_eRm)
-  plotICC(rasch_model_1)
+  rasch_model_eRm = RM(data_for_eRm)
   
   
   #approach 2: lme4
@@ -131,15 +130,17 @@ dich$score = rowSums(dich[,1:10])
   data_for_lme4 = dich[,1:10]
   data_for_lme4$id = 1:nrow(data_for_lme4)
   data_for_lme4 = melt(data_for_lme4, id.vars = "id")
-  rasch_model_2 = glmer(value~0+(1|id)+(1|variable), data = data_for_lme4,
+  rasch_model_lme4 = glmer(value~0+variable+(1|id), data = data_for_lme4,
                         family = binomial)
-  #TODO check: how to interpret parameters?
+  smr_lme4 = summary(rasch_model_lme4)
+  
+  #TODO check: why are estimates different?
   #aproach 3: lavaan
   #modified copy from https://jonathantemplin.com/wp-content/uploads/2022/02/EPSY906_Example05_Binary_IFA-IRT_Models.nb.html
   lavaansyntax = "
 
     # loadings/discrimination parameters:
-    SCS =~ loading*Q1 + loading*Q2 + loading*Q3 + loading*Q4 + loading*Q5 + loading*Q6 + loading*Q7 + loading*Q8 + loading*Q9 + loading*Q10
+    SCS =~ l*Q1 + l*Q2 + l*Q3 + l*Q4 + l*Q5 + l*Q6 + l*Q7 + l*Q8 + l*Q9 + l*Q10
     
     # threshholds use the | operator and start at value 1 after t:
     Q1 | t1; Q2 | t1; Q3 | t1; Q4 | t1; Q5 | t1; Q6 | t1; Q7 | t1; Q8 | t1; Q9 | t1;Q10 | t1;
@@ -151,15 +152,15 @@ dich$score = rowSums(dich[,1:10])
     SCS ~~ 1*SCS
     
     "
-  
-  rasch_model_3 = sem(model = lavaansyntax, data = dich[,SCS_vars], ordered = SCS_vars,
+  data_for_lavaan = dich[,SCS_vars]
+  rasch_model_lavaan = sem(model = lavaansyntax, data = data_for_lavaan, ordered = SCS_vars,
                          mimic = "Mplus", estimator = "WLSMV", std.lv = TRUE, parameterization = "theta")
-  summary(rasch_model_3, fit.measures = TRUE, rsquare = TRUE, standardized = TRUE)
+  smr_lavaan = summary(rasch_model_lavaan, fit.measures = TRUE, rsquare = TRUE, standardized = TRUE)
   
   
   #make ICC plot function
   ICC_plot = function(betas){
-    df = data.frame(x=seq(-5,5,.01))
+    df = data.frame(x=seq(-6,6,.01))
     for (i in 1:length(betas)){
       df[[SCS_vars[i]]] = logistic(df$x, betas[i])
     }
@@ -169,10 +170,33 @@ dich$score = rowSums(dich[,1:10])
     plt=ggplot(df, aes(x = x, y = value, color = item, label = item)) + geom_line() + 
       theme_clean() + xlab("Person parameter") + ylab("P(item solved)")
     return(directlabels::direct.label(plt, "last.qp"))
-      }
+  }
   
-}
+  #make ICC plots
+  betas_eRm = rasch_model_eRm$betapar
+  iccplot_eRm=ICC_plot(betas_eRm)
+  iccplot_eRm+ggtitle("eRm")
+
+  betas_lme4 = smr_lme4$coefficients[,"Estimate"]
+  iccplot_lme4 = ICC_plot(betas_lme4)
+  iccplot_lme4+ggtitle("lme4")
+  
+  betas_lavaan = smr_lavaan$PE[(smr_lavaan$PE$op == "|"),"est"]
+  iccplot_lavaan=ICC_plot(betas_lavaan)
+  iccplot_lavaan+ggtitle("lavaan")
+  
+  }
+
+#alternative model: 2PL
+{}
 
 
+#DIF
+{}
 
 
+#reliability, unidimensionality
+{}
+
+#measurement invariance
+#polytomous IRT model
