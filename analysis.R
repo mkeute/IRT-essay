@@ -9,9 +9,10 @@ require(tidyr)
 require(psych)
 require(ggcorrplot)
 require(eRm)
-require(lme4)
+require(ltm)
 require(lavaan)
-
+require(patchwork)
+require(difR)
 
 #####
 #part 1: data preparation, descriptive analyses
@@ -82,6 +83,15 @@ df_clean[,1:10] %>% summarise_all(list(mean=mean, median = median, min = min, ma
 #re-calculate sum score
 df_clean$score = rowSums(df_clean[,1:10])
 
+#distribution plot before dichotomization
+tmp = melt(
+          cbind(data.frame(id=1:nrow(df_clean)),df_clean[,SCS_vars]),
+          id.vars="id")
+tmp2 = data.frame(table(tmp$variable,forplot$value))
+colnames(tmp2) = c("item","response","Freq")
+ggplot(tmp2,aes(x=item, y=Freq, fill=response))+geom_col()+theme_clean()
+ggsave("distroplot.pdf",width = 4,height = 2)
+
 #dichotomization
 dich = df_clean
 dich[,1:10] = data.frame(lapply(df_clean[,1:10], function (x) as.numeric(x > 2)))
@@ -120,21 +130,17 @@ dich$score = rowSums(dich[,1:10])
   #approach 1: eRm
   #prepare data for eRm estimation
   #(just item data in wide format)
-  data_for_eRm = dich[,1:10]
-  rasch_model_eRm = RM(data_for_eRm)
+  rasch_model_eRm = RM(dich[,SCS_vars])
+  smr_eRm = summary(rasch_model_eRm)
+  
+  #approach 2: ltm
+  #constraint fixes item discriminativity to 1
+  rasch_model_ltm = rasch(dich[,SCS_vars], constraint = cbind(length(SCS_vars) + 1, 1))
+  smr_ltm = summary(rasch_model_ltm)
   
   
-  #approach 2: lme4
-  #prepare data for lme4 estimation
-  #(item and subject data in long format)
-  data_for_lme4 = dich[,1:10]
-  data_for_lme4$id = 1:nrow(data_for_lme4)
-  data_for_lme4 = melt(data_for_lme4, id.vars = "id")
-  rasch_model_lme4 = glmer(value~0+variable+(1|id), data = data_for_lme4,
-                        family = binomial)
-  smr_lme4 = summary(rasch_model_lme4)
-  
-  #TODO check: why are estimates different?
+
+  #TODO check syntax
   #aproach 3: lavaan
   #modified copy from https://jonathantemplin.com/wp-content/uploads/2022/02/EPSY906_Example05_Binary_IFA-IRT_Models.nb.html
   lavaansyntax = "
@@ -152,51 +158,161 @@ dich$score = rowSums(dich[,1:10])
     SCS ~~ 1*SCS
     
     "
-  data_for_lavaan = dich[,SCS_vars]
-  rasch_model_lavaan = sem(model = lavaansyntax, data = data_for_lavaan, ordered = SCS_vars,
+  
+  rasch_model_lavaan = sem(model = lavaansyntax, data =  dich[,SCS_vars], ordered = SCS_vars,
                          mimic = "Mplus", estimator = "WLSMV", std.lv = TRUE, parameterization = "theta")
   smr_lavaan = summary(rasch_model_lavaan, fit.measures = TRUE, rsquare = TRUE, standardized = TRUE)
   
+  convertTheta2IRT = function(lavObject){
+    #modified copy from 
+    #https://jonathantemplin.com/wp-content/uploads/2022/02/EPSY906_Example05_Binary_IFA-IRT_Models.nb.html
+    
+    if (!lavObject@Options$parameterization == "theta") {
+      stop("your model is not estimated with parameterization='theta'")
+      }
+    
+    output = inspect(object = lavObject, what = "est")
+    if (ncol(output$lambda)>1) { stop("IRT conversion is only valid 
+             for one dimensional factor models. 
+             Your model has more than one dimension.")
+      }    
+    a = output$lambda
+    b = -output$tau/output$lambda
+    return(list(a = a, b=b))
+  }
   
   #make ICC plot function
-  ICC_plot = function(betas){
+  ICC_plot = function(difficulty, discriminativity = 1){
+    if (length(discriminativity)==1){
+        discriminativity = rep(discriminativity, length(difficulty))
+      }
     df = data.frame(x=seq(-6,6,.01))
-    for (i in 1:length(betas)){
-      df[[SCS_vars[i]]] = logistic(df$x, betas[i])
+    for (i in 1:length(difficulty)){
+      df[[SCS_vars[i]]] = logistic(x=df$x, d=difficulty[i], a=discriminativity[i])
     }
     
     df = melt(df, id.vars = "x")
     colnames(df)[2] = "item"
-    plt=ggplot(df, aes(x = x, y = value, color = item, label = item)) + geom_line() + 
-      theme_clean() + xlab("Person parameter") + ylab("P(item solved)")
+    plt=ggplot(df, aes(x = x, y = value, color = item, label = item)) + 
+      geom_line() + theme_clean() + xlab("Person parameter") + 
+      ylab("P(item solved)")
     return(directlabels::direct.label(plt, "last.qp"))
   }
   
-  #make ICC plots
-  betas_eRm = rasch_model_eRm$betapar
-  iccplot_eRm=ICC_plot(betas_eRm)
-  iccplot_eRm+ggtitle("eRm")
 
-  betas_lme4 = smr_lme4$coefficients[,"Estimate"]
-  iccplot_lme4 = ICC_plot(betas_lme4)
-  iccplot_lme4+ggtitle("lme4")
   
-  betas_lavaan = smr_lavaan$PE[(smr_lavaan$PE$op == "|"),"est"]
-  iccplot_lavaan=ICC_plot(betas_lavaan)
-  iccplot_lavaan+ggtitle("lavaan")
+  #make ICC plots
+  difficulties_eRm = -rasch_model_eRm$betapar
+  iccplot_eRm=ICC_plot(difficulties_eRm)+ggtitle("eRm")
+  
+
+  
+  #lme4 difficulties are shifted by .42 from eRm difficulties, why?
+  
+  difficulties_ltm = smr_ltm$coefficients[1:10,"value"]
+  iccplot_ltm = ICC_plot(difficulties_ltm)+ggtitle("ltm")
+  
+  
+  difficulties_lavaan =   -convertTheta2IRT(lavObject = rasch_model_lavaan)$b
+  
+  #TODO: check ICC plotting fct
+  iccplot_lavaan=ICC_plot(difficulties_lavaan)+ggtitle("lavaan")
+  
+  
+  
+  difficulties = rbind( data.frame(model="eRm",
+                            item=factor(paste0("Q",as.character(1:10))),
+                            difficulty=as.numeric(difficulties_eRm)),
+                data.frame(model="ltm",
+                           item=factor(paste0("Q",as.character(1:10))),
+                           difficulty=as.numeric(difficulties_ltm)),
+                data.frame(model="lavaan",
+                           item=factor(paste0("Q",as.character(1:10))),
+                           difficulty=as.numeric(difficulties_lavaan)),
+                data.frame(model="CTT",
+                           item=factor(paste0("Q",as.character(1:10))),
+                           difficulty=1-as.numeric(dich.distro[1,])/100))
+  difficulties_plot = ggplot(difficulties,aes(x=item,y=difficulty,color=model,group=model)) + 
+    geom_point() + geom_line() + theme_clean() + ggtitle("model comparison")
+  
+  #arrange plots vertically and save
+  iccplot_eRm/iccplot_ltm/iccplot_lavaan/difficulties_plot
+  ggsave("iccfig.pdf",width = 6,height = 8)
+  
+  
+  #compare fits
+  summary(rasch_model_eRm)
+  smr_lavaan$FIT
+  smr_ltm$AIC
   
   }
 
-#alternative model: 2PL
-{}
-
-
 #DIF
-{}
+{
+  data_dif_age = dich[,SCS_vars]
+  data_dif_age$age = dich$age > median(dich$age)
+  dif_ageL = difLord(data_dif_age,"age",FALSE,"1PL")
+  dif_ageR = difRaju(data_dif_age,"age",FALSE, "1PL")
+  
+  
+  data_dif_gender= dich[,c(SCS_vars,"gender")]
+  dif_genderL = difLord(data_dif_gender,"gender",1, "1PL")
+  dif_genderR = difRaju(data_dif_gender,"gender",1, "1PL")
+  
+  difstats=data.frame(
+    p=-log10(p.adjust(
+      c(dif_genderL$p.value,dif_ageL$p.value),method="fdr")),
+    item = c(dif_genderL$names,dif_ageL$name),
+    groups = c(rep("gender",10),rep("age",10))
+    )
+  
+  
+  ggplot(difstats, aes(x=item, y=p, group=groups,col=groups)) + 
+    geom_point() + geom_line() + theme_clean() + ylab("-log10(p)")+
+    geom_hline(yintercept=-log10(.05))+scale_x_discrete(breaks=paste0("Q",1:10),
+                                                        limits=paste0("Q",1:10))
+  
+  ggsave("DIF_pvals.pdf",width = 4,height = 3)
+  }
+
+#alternative model: 2PL
+{
+  
+  #fit 1PL and 2PL, compare fit
+  twoPL_model = ltm(dich[,SCS_vars] ~ z1, IRT.param = TRUE)
+  difficulties_2PL = coef(twoPL_model)[,"Dffclt"]
+  discriminativities_2PL = coef(twoPL_model)[,"Dscrmn"]
+  ICC_2PL = ICC_plot(difficulty = difficulties_2PL,
+                     discriminativity = discriminativities_2PL)
+  
+  
+  Rasch_vs_twoPL_comparison = anova(rasch_model_ltm, twoPL_model)
+  difficulties_1vs2PL = rbind( data.frame(model="Rasch (1-PL)",
+                                   item=factor(paste0("Q",as.character(1:10))),
+                                   difficulty=as.numeric(difficulties_ltm)),
+                        data.frame(model="Birnbaum (2-PL)",
+                                   item=factor(paste0("Q",as.character(1:10))),
+                                   difficulty=as.numeric(difficulties_2PL)),
+                        data.frame(model="CTT",
+                                   item=factor(paste0("Q",as.character(1:10))),
+                                   difficulty=as.numeric(dich.distro[1,])/100))
+  difficulties_plot = ggplot(difficulties_1vs2PL,aes(x=item,y=difficulty,color=model,group=model)) + 
+    geom_point() + geom_line() + theme_clean() + ggtitle("model comparison")
+  
+  
+  }
+
+#alternative models: bifactor, ...
 
 
 #reliability, unidimensionality
-{}
+{
+  
+  
+}
 
-#measurement invariance
 #polytomous IRT model
+{
+  
+  
+}
