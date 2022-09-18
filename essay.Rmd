@@ -4,12 +4,20 @@ date: \today
 author: "Marius Keute"
 output: bookdown::pdf_document2
 bibliography: refs.bib
+fontsize: 12pt
+github-repo: mkeute/IRT-essay
+geometry: margin=2.5cm
 ---
 
-\
-\
-\
-\
+
+```{r, echo=FALSE,include=FALSE,results='hide',warning=FALSE,message=FALSE}
+#run analysis code once to have everything available but do not include it. Code will be included at the end.
+source("analysis.R")
+```
+
+
+\newpage
+
 **submitted to:**
 
 **Dr. Stefano Noventa**
@@ -63,21 +71,25 @@ The 10 items are (@kalichman2001sexual):
 
 In this essay, using data from the original validation cohort (@kalichman2001sexual), I will provide a thorough analysis of the SCS, using methods derived from Item Response Theory (IRT), and to a lesser extent from Classical Test Theory (CTT). In the final section, I will give an overview over both theories and their key differences.
 
+\newpage
 # Preparing the Data
 
-The dataset (@kalichman1995sexual) consisted of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher appeared implausible and therefore set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" (other) were set to missing values. Of the remaining cases, 2295 (68.5%) reported male gender ("1") and 1053 (31.4%) reported female gender ("2"). In the dataset, 133 cases contained at least one missing value. 
+The dataset (@kalichman1995sexual) consists of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher appeared implausible and therefore set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" (other) were set to missing values. Of the remaining cases, 2295 (68.5%) reported male gender ("1") and 1053 (31.4%) reported female gender ("2"). In the dataset, 133 cases contained at least one missing value. 
 
-The pattern of missing SCS items is shown in Figure \@ref(fig:missing-plot). It can be seen that item Q9 was missing most often, though not by a large margin (Q9: 27 missing values, Q5: 13 missing values). It can be seen that the majority of cases with missing values (118 cases / 88.7%) had only a single item missing, while there were no prominent patterns of items that tended to be jointly missing. Eight cases where more than two SCS items were missing were excluded from all further analyses. For the remaining 3368 cases, the probability of missing values at each SCS variable was modeled as a function of the values in all other SCS variables using a logistic regression model: $P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta})$, where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$, $X_{i,\not q}$ denotes the item values of all other items, $\sigma$ is the logistic function $\sigma(x) = \frac{1}{1-e^{-x}}$, and $\hat{\beta}$ are the estimated regression weights (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since those cases were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
+The pattern of missing SCS items is shown in Figure \@ref(fig:missing-plot). It can be seen that item Q9 was missing most often, though not by a large margin (Q9: 27 missing values, Q5: 13 missing values). It can be seen that the majority of cases with missing values (118 cases / 88.7%) had only a single missing item, while there were no prominent patterns of items that tended to be jointly missing. Eight cases where more than two SCS items were missing were excluded from all further analyses. For the remaining 3368 cases, the probability of missing values at each SCS variable was modeled as a function of the values in *all other* SCS variables using a logistic regression model: 
 
+$P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta})$,
 
-```{r, echo=FALSE,include=FALSE,results='hide',warning=FALSE,message=FALSE}
-source("analysis.R")
-```
-```{r missing-plot,  out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
+where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$, $X_{i,\not q}$ denotes the item values of all other items except item $q$, $\sigma$ is the logistic function $\sigma(x) = \frac{1}{1-e^{-x}}$, and $\hat{\beta}$ are the estimated regression weights (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since those cases were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
+
+```{r missing-plot,  echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
 knitr::include_graphics("missingplot.pdf")
 ``` 
 
-The distribution of responses for each item before dichotomization can be seen in \@ref(fig:distroplot). All item categories show a reasonable coverage of the range of responses, and there are no obvious flooring or ceiling effects, except for a slight tendency with item Q6.
+\newpage
+# Descriptive Analyses and Dichotomization
+
+The distribution of responses for each item before dichotomization can be seen in Figure \@ref(fig:distroplot). All item categories show reasonable coverage of the range of responses (1-4), and there are no obvious flooring or ceiling effects, except for a slight tendency to a flooring effect with item Q6 (few cases with response 1).
 
 ```{r distroplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Distribution of non-dichotomized responses per item"}
 knitr::include_graphics("distroplot.pdf")
@@ -95,59 +107,93 @@ D_{i,q} = \begin{cases}
 $$
 ```
 
-Descriptive characteristics of the 10 SCS items are shown in \@ref(tab:descriptivestab), the proportions of 'correct' responses, i.e., responses greater than 2, are shown in \@ref(tab:dichdistrotab). Since most variables' median was 2, this was not much different from an item-wise median threshold (see \@ref(tab:descriptivestab)). 
+Of note, simple models in IRT such as the Rasch model (see below) assume that all item responses are either correct or incorrect (or solved / unsolved, respectively). Since a personality test such as the SCS does not have right or wrong responses, it is common to dichotomize the values, as described above, and henceforth treat one of the dichotomous response options as the 'correct' one, in this case, responses greater than 2. This is, however, purely for compliance with IRT terminology and does not imply that the 'correct' dichotomous responses are better than the 'incorrect' ones in any way. 
+
+Descriptive characteristics of the 10 SCS items are shown in Table \@ref(tab:descriptivestab), the proportions of correct responses are shown in Figure \@ref(tab:dichdistrotab). Since most variables' median was 2, this was not much different from an item-wise median threshold (see Table \@ref(tab:descriptivestab)). 
 
 Subsequently, I calculated biserial correlations between all pairs of dichotomized items. Moreover, I calculated item discrimination, i.e., each items ability to discriminate between high- and low-scoring individuals, using the adjusted item-total correlation method (@reynolds2021mastering), i.e., by calculating biserial correlation coefficients between each (dichotomized) item's scores and the sum of all other (dichotomized) items.
 
-#TODO make tables smaller (too wide)
-#TODO make captions and table referencing work
-
-
-
-
+Item intercorrelations are shown in Figure \@ref(fig:biserialcorplot). It can be seen that all pairs of items show moderate to high positive correlations, indicating that all items measure similar information yet are not redundant. Item easiness (i.e., proportion of correct responses) was between 27% (item Q4) and 71.9% (item Q6), item discrimination was between .26 (item Q6) and .45 (items Q1, Q2), i.e., there was no item with a trivial response pattern (e.g., all or no responses correct), and no item was a good representation of the entire scale, since all item discriminations were only moderate in size.
 
 ```{r descriptivestab, echo=FALSE}
-knitr::kable(descriptives, caption = "Descriptive item statistics (mean, median and range before dichotomization)")
+knitr::kable(descriptives, caption = "Descriptive item statistics (mean, median and range *before* dichotomization)")
 ```
 ```{r dichdistrotab, echo=FALSE}
 knitr::kable(dich.stats, caption = "Distribution and discrimination of dichotomized items")
 ```
-Item intercorrelations are shown in Figure \@ref(fig:biserialcorplot).
-#TODO discuss
+
+
 ```{r biserialcorplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
 knitr::include_graphics("biserial_cor_mat.pdf")
 ``` 
 
+\newpage
 # IRT modeling
 
+After analyzing the SCS data using descriptive statistics and concepts derived from CTT, in the following I will fit and discuss different IRT models to the data.
+
 ## Rasch model estimation
-Next, I estimated a *Rasch* model for the SCS data using three different software implementations. The *Rasch* model is also known as the one-parameter logistic model. It models a given person's chances of solving a given item as a logistic function of the difference between the $q^{th}$ item's difficulty $\beta_q$ and the $i^{th}$ person's ability $\theta_i$, where $\beta_q$ and $\theta_i$ are latent (unobserved) quantities that are estimated from the dichotomous (solved vs. not solved) item data. The probability for a given person can then be expressed by the logistic function: $P(D_{i,q} = 1 | \beta_q, \theta_i) = \sigma(\theta_i - \beta_q)$, where $\sigma$ is the logistic function as specified above.
+Next, I estimated a *Rasch* model for the SCS data, also known as either the one-parameter logistic model or one-parameter normal ogive model, depending on the parameterization. 
 
-The first method was the one implemented in the R package `eRm`. (@mair2007extended) eRm: identifying constraint is sum(beta)=0 and discr. = 1, conditional MLE
+It models a given person's chances of solving a given item as a logistic function of the difference between the $q^{th}$ item's difficulty $\beta_q$ and the $i^{th}$ person's ability $\theta_i$, where $\beta_q$ and $\theta_i$ are latent (unobserved) quantities that are estimated from the dichotomous (solved vs. not solved) item data. 
 
-The second method was the one implemented in the R package `ltm` (@rizopoulos2006ltm)
-ltm: identifying constraint is discr = 1; marginal MLE
+The probability for a given person can then be expressed by the logistic function: $P(D_{i,q} = 1 | \beta_q, \theta_i) = \sigma(\theta_i - \beta_q)$, where $\sigma$ is the logistic function as specified above. That is to say, it is purely the difference between item difficulty and person ability that explains the correctness of item responses within the model. 
 
-The third method was a structural equation model as implemented in `lavaan` (@rosseel2012lavaan, @templin2022IRT). 
+Crucially, the model assumes that this relationship is identical for all items, i.e., the logistic function can only be shifted but not changed in slope across items with different difficulty. Item difficulty is, therefore, the only free parameter of the *Rasch* model, whereas alternative models (see below) also estimate additional parameters. 
+
+To obtain a comprehensive picture, I fitted *Rasch* models using three different software implementations in `R` 4.1.
+
+The first method was the one implemented in the R package `eRm` (@mair2007extended). The `eRm::RM` function estimates a *Rasch* model using conditional maximum likelihood estimation. To make the model identifiable, the user can choose between two model constraints, namely that the model parameters must sum to 0 or that the first item's parameter is fixed to 0. I chose the first (default) option, i.e., forcing item difficulties to sum to 0. Item discriminativity, i.e., the steepest slope of the logistic functions (at $\beta_q = \theta_i$), is fixed to 1 for all items in this implementation.
+
+The second method was the one implemented in the R package `ltm` (@rizopoulos2006ltm). The `ltm::rasch` function estimates a *Rasch* model using approximate marginal maximum likelihood estimation. This package provides the user with more flexibility to impose constraints on the model than `eRm`, I fixed item discriminativity to 1 for all items, to maximize comparability with the `eRm` parameters.
+
+The third method was a structural equation model as implemented in `lavaan` (@rosseel2012lavaan). Unlike the two previous implementations, `lavaan` requires a more explicitly user-defined model specification, as it does not provide any ready-made function or syntax for *Rasch* models. I used a modified copy of the syntax presented in @templin2022IRT:
+
+```
+SCS =~ 1*Q1 + 1*Q2 + 1*Q3 + 1*Q4 + 1*Q5 + 1*Q6 + 1*Q7 + 1*Q8 + 1*Q9 + 1*Q10
+
+Q1 | t1; Q2 | t1; Q3 | t1; Q4 | t1; Q5 | t1; Q6 | t1; Q7 | t1; 
+Q8 | t1; Q9 | t1;Q10 | t1;
+
+SCS ~ 0;
+
+SCS ~~ 1*SCS
+```
+
+Again, I fixed item discriminativities to 1 for all items. The item parameters `Q1`, ..., `Q10` were subjected to a common threshold `t1`, and the sum of all item parameters (corresponding to the latent variable `SCS`) was fixed to 0, as with `eRm`. Moreover, its variance was fixed to unit.
+
 
 ## Model analysis
+The item difficulty parameters of the three models are shown in Figure \@ref(fig:difficultyplot), along with the item difficulty derived from CTT (i.e., the proportion of incorrect responses per item). While the parameters differed between the different models, it is important to note that the parameters from all four models (including CTT) were perfectly correlated for all pairs of models (all r > .999), which indicates that the parameters of one model are simply affine linear transformations of the parameters of any other model, i.e., while numerically different, the models incorporated identical information about the items. The corresponding item-characteristic curves (ICC) are shown in Figure \@ref(fig:iccplot). ICCs are generated by calculating the function graph of the item-wise logistic functions parameterized by item difficulty, across a range of possible person ability values on the x-axis.
 
-ICC curves
-Fit indices
+```{r difficultyplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Item difficulties in comparison."}
+knitr::include_graphics("diffcfig.pdf")
+``` 
+
+
+```{r iccplot, echo=FALSE, out.width="100%", fig.align = 'center', fig.cap="Item-characteristic curves for the three Rasch models."}
+knitr::include_graphics("iccfig.pdf")
+``` 
+
+#TODO insert table with fits, discuss the implications
 
 ## DIF
 I tested for differential item functioning (DIF) using the package `difR` and the procedure outlined in the companion paper (@magis2010general). DIF is a disadvantageous property of a *Rasch* model, meaning that item responses differ between subjects from different participant groups, even given the same estimated ability level. The presence of DIF indicates a lack of measurement invariance of the model. The results are displayed in \@ref(fig:diffig). I used the `difLord` method to investigate DIF, but obtained essentially the same results with the `difRaju` method. I discarded `difLRT`, the third recommended IRT-related method,  due to its high computational demand. I tested for DIF across genders (male vs. female) and age groups (above median age vs. smaller or equal to median age). Significant DIF (FDR-corrected p-value < .05) across the gender groups was detected for items Q5 and Q10, and across the age groups for item Q1, Q5, and Q10. However, the effect sizes were in the negligible range for all but item Q5 in the gender group comparison, where a moderate effect was detected ($\Delta_{Lord} = -1.14$). Since I have only been considering Rasch (one-parameter) models so far, this analysis only tested for uniform DIF.
 
-```{r diffig, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="p-values (FDR corrected) from DIF analysis"}
+```{r diffig, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="p-values (FDR corrected, negative log-transformed) from DIF analysis. Black line: significance threshold (p < .05)"}
 knitr::include_graphics("DIF_pvals.pdf")
 ``` 
 
-# Alternative models
+# Alternative IRT models
 
-## k-Parameters Models
 There are several extensions and alternatives to the *Rasch* model with its restrictive assumptions that differences between items can be described by just one parameter, namely item difficulty, while the *Birnbaum* model or 2-parameters logistic model also takes into account item discriminativity (corresponding to varying slopes of the item-characteristic curves of different items), and other possible models additionally include a guessing probability term (corresponding to various vertical offsets of the item-characteristic curves of different items) or ceiling probability term (corresponding to clipping the item-characteristic curves from above). For the given dataset, it appears reasonable to estimate a *Birnbaum* model, whereas 3-PL or 4-PL models seem difficult, since guessing and ceiling probabilities are not easy to operationalize for the dataset, considering that there is no ground truth to the items and we found no prominent ceiling or flooring in any item.
 
-## Factorial models
+# ICCs
+# fit
+# model comparison
+
+# Factor models
+original categorical data
 bifactor, ...
 
 ## Polytomous model
@@ -160,11 +206,20 @@ Procedure outlined in @smyth2022Item
 # Theoretical Part: Key differences between IRT and CTT
 ## Introduction
 
-Unlike some physical quantities, many of the variables of interest in psychology, economics, and other human-centric fields, are latent, i.e., not directly observable. Researchers often try to reconstruct such latent variables by combining several observable variables. In particular, for psychological concepts such as personality traits, a person's score will often be estimated as a combination of item responses in a psychological test. The traditional view of psychological tests (Classical Test Theory, CTT) conceived a given person's total score across all items of a test as an additive combination of the person's true score and a testing error: $X_i = \tau_i + \epsilon_i$ (@linden1997item). 
+Unlike some physical quantities, many of the variables of interest in psychology, economics, and other human-centric fields, are latent, i.e., not directly observable. Researchers often try to reconstruct such latent variables by combining several observable variables. In particular, for psychological concepts such as personality traits, a person's score will often be estimated as a combination of item responses in a psychological test. Even though forerunners of psychological tests have been around for centuries, a comprehensive theory of psychological testing only emerged roughly half a century ago. Commonly, Melvin Novick is considered the first author to present a comprehensive account of Classical Test Theory (CTT) (@novick1965axioms). Around the same time, a probabilistic view of psychological testing began to emerge, which are now referred to as Item Response Theory (IRT) (@rasch1960studies). It is interesting to note that *Classical* Test Theory does, therefore, not refer to the theory itself being older, but that it rather describes the 'classical' way authors thought about psychological testing from the early $20^{th}$ century onward, whereas probabilistic approaches became popular only later, when increasing computational capacity made them practical. In the following, I will describe some of the core ideas underlying CTT and ITT, their respective strengths and limitations, and practical applications. 
 
-## Assumptions of IRT models
+## Core Ideas
 
-## Limitations of IRT models
+### CTT
+The traditional view of psychological tests (Classical Test Theory, CTT) conceived a given person's total score across all items of a test as an additive combination of the person's true score and a testing error: $X_i = \tau_i + \epsilon_i$ (@linden1997item). (@crocker2008introduction)
+
+### IRT
+
+## Strenghts
+
+## Limitations
+
+## Conclusion and Application
 
 
 \newpage
