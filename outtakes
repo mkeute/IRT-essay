@@ -1,0 +1,87 @@
+
+# Higher-parameterized IRT models
+
+**#TODO there is some problem for knitting in this paragraph, find out!** 
+There are several extensions and alternatives to the Rasch model with its restrictive assumptions that differences between items can be described by just one parameter, namely item difficulty, while the Birnbaum model or 2-parameters logistic model also takes into account item discriminativity (corresponding to varying slopes of the item-characteristic curves of different items), and other possible models additionally include a guessing probability term (corresponding to various vertical offsets of the item-characteristic curves of different items) or ceiling probability term (corresponding to clipping the item-characteristic curves from above). For the given dataset, it appears reasonable to estimate a Birnbaum model, whereas 3-PL or 4-PL models seem difficult, since guessing and ceiling probabilities are not easy to operationalize for the dataset, considering that there is no ground truth to the items and we found no prominent ceiling or flooring in any item.
+
+For fitting the 2-PL model, I used the `ltm::ltm` function, and the Rasch model fitted using `ltm::rasch` served as a baseline model for comparison. ICCs and estimated item difficulty parameters are shown in Figure \@ref(fig:ICC_2PLfig) and \@ref(fig:diffc_2PLfig), respectively. It can clearly be seen that item discriminativities, and with them the slopes of the ICC curves, vary considerably between items. A side-effect of two-parameter modeling is that the ICCs now cross each other, i.e., there is no clear order of difficulty between items anymore, but whether one item is more difficult than another can now be dependent on the person ability.
+
+Comparing the two models using a Likelihood Ratio Test, I found the 2-PL model to fit the data significantly better than the Rasch model (log-LR = 1741.55, p \< .001).
+
+```{r ICC_2PLfig, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Item-Characteristic Curves from 2-PL model"}
+knitr::include_graphics("ICC_2PL.pdf")
+```
+
+For further model comparison, I calculated infit and outfit indices for each item and model. Infit and outfit indices are based on model residuals. While outfit (short for outlier-sensitive fit statistic) is particularly sensitive to unexpected responses in cases where item difficulty and person ability are far apart (e.g., a low-ability person unexpectedly solves several very difficult items), infit (short for information-weighted fit statistic) is particularly sensitive to unexpected responses in cases where item difficulty and person ability match (e.g., a person solves far less or far more than half of the items whose difficulty equals their ability). Both are based on the normalized residuals $Z_{iq} = \frac{D_{iq}-\mathbb{E}(D_{iq})}{\sqrt{var(D_{iq})}}$, where $D_{iq}$ is the actual response of person i to item q, $\mathbb{E}(D_{iq}) = P(D_{iq}=1|\beta_q,\theta_i)$ is the conditional expectation for this person's response to the item, given the model parameters, calculated using the logistic function as shown above. $var(D_{iq})$ can be calculated as $P(D_{iq}=1|\beta_q,\theta_i)(1-P(D_{iq}=1|\beta_q,\theta_i))$. The infit index for item q is then defined as: $Infit_q = \sum_{i=1}^n (\frac{var(D_{iq})}{\sum_{i=1}^n var(D_{iq})}Z_{iq}^2)$, the outfit index is defined as: $Outfit_q = \sum_{i=1}^n \frac{Z_{iq}^2}{n}$. For both indices, values close to 1 indicate good fit, whereas higher values indicate under- and lower values overfitting.
+
+The infit and outfit values for both models are, for the most part, in the acceptable (\>0.7 and \<1.3) range (see Figure \@ref(tab:modelcomptab)). For infit, the 2-PL model consistently outperforms the Rasch model, whereas the outfit values tend to be lower overall, and both models are much closer to each other.
+
+```{r diffc_2PLfig, echo=FALSE, out.width="100%", fig.align = 'center', fig.cap="Estimated item difficulties and discriminativities based on CTT, Rasch model and 2-PL model. For both IRT models, error bars indicate standard errors."}
+knitr::include_graphics("difficulties_plot_2PL.pdf")
+```
+
+```{r inoutfit_2PLfig, echo=FALSE, out.width="100%", fig.align = 'center', fig.cap="Infit and outfit indices for each item in the Rasch and 2-PL models"}
+knitr::include_graphics("inoutfit_plot_2PL.pdf")
+```
+
+# Polytomous IRT model
+
+Procedure outlined in @smyth2022Item
+
+# Factor models
+
+Following the IRT analysis of the dichotomized data, I went back to the original, non-dichotomized data, to investigate its factorial structure. It has been suggested that the SCS can best be described by two latent factors, one comprising items Q1, Q2, Q3, Q4, and Q10, being related to consequences of sexual behavior and compulsivity to one's lifestyle, and a second one comprising items Q5, Q6, Q7, Q8, and Q9, being related to the compulsivity of one's sexual thoughts without necessarily affecting actual behavior. Using `lavaan::cfa`, I fitted several confirmatory factor analysis (CFA) models to the data to find the latent structure that describes the data best. I specified four candidate latent structures:
+
+The first candidate structure was a unidimensional model, i.e., the data can be explained by a single underlying latent factor.
+
+The second candidate structure was a two-factor correlated-traits model, i.e., two latent factors were specified with item loadings as described above, and correlations between the two latent factors were allowed.
+
+The third candidate structure was a bifactor model, i.e., two latent factors were specified with item loadings as described above, with an additional general factor on which all items load. No correlations between factors were allowed.
+
+The final candidate structure was a hierarchical factor model, which specifies the two item-specific factors, and additionally has them load on a shared second-order factor.
+
+Models were fitted with standardized latent variables, i.e., the variance of all latent factors was fixed to unit. The models were specified in `lavaan` syntax as follows:
+
+    Unidimensional model:
+      xi1 =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+      
+    Correlated-traits model:
+      xi1 =~ Q1+Q2+Q3+Q4+Q10
+      xi2 =~ Q5+Q6+Q7+Q8+Q9
+      xi1 ~~ xi2
+
+    Bifactor model:  
+      G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+      xi1 =~ Q1+Q2+Q3+Q4+Q10
+      xi2 =~ Q5+Q6+Q7+Q8+Q9
+      G ~~ 0*xi1
+      G ~~ 0*xi2
+      xi1 ~~ 0*xi2
+
+      
+    Hierarchical model:
+      xi1 =~ Q1+Q2+Q3+Q4+Q10
+      xi2 =~ Q5+Q6+Q7+Q8+Q9
+      G =~ xi1+xi2
+
+The comparison of fits between the four factor models is shown in \@ref(tab:cfa_modelfittab). In addition to the Akaike (AIC) and Bayes-Schwarz (BIC) information criteria, models were compared by means of Likelihood Ratio Tests (LRT). Of note, the hierarchical model did not fit into the nesting hierarchy of the remaining models, therefore it could not be included in the LRT comparison. Among the three other models, the correlated-traits model fit the data significantly better than the unidimensional model, and the bifactor model, in turn, fit significantly better than the correlated-traits model. Considering information criteria, the bifactor model was clearly the preferred one among the four candidate models according to AIC as well as BIC.
+
+```{r cfa_modelfittab, echo=FALSE}
+cfaaov_df=read.csv("cfaaov_df.csv")
+knitr::kable(cfaaov_df, caption = "Model comparison between CFA models")
+```
+
+The 'winning' bifactor model is illustrated in Figure \@ref(fig:semplot_bifactor). Obviously, the fact that the bifactor model is the preferred option among the four candidate models does not mean that it is necessarily a good description of the data in an absolute sense. To understand the absolute goodness-of-fit (not just compared to other models), there is a range of fit indices that we can consider. In particular, the root mean squared error of approximation (RMSEA), standardized root mean squared residual (SRMR), comparative fit index (CFI), and Tucker-Lewis index (TLI) are informative. For the bifactor model, RMSEA was at 0.073 (RMSEA < 0.08 indicating acceptable, RMSEA < 0.05 indicating good fit by convention), SRMR was at 0.028 (SRMR < 0.05 indicating good fit by convention), CFI was at 0.973 (CFI > 0.95 indicating good fit by convention), and TLI was at 0.95 (TLI > 0.95 indicating acceptable, TLI > 0.97 indicating good fit by convention). Overall, the bifactor model was, therefore, an acceptable to good fit for the SCS data.
+
+```{r semplot_bifactor, echo=FALSE, out.width="100%", fig.align = 'center', fig.cap="Factor structure and loadings of bifactor model"}
+knitr::include_graphics("semplot_bifactor.pdf")
+```
+
+An open question with respect to the factorial structure is to which subscale item Q10 should belong. While it has been assigned to the first subfactor, its loading on the factor is low (0.18, around half as high as the second-lowest loading item, Q4). To investigate the issue, I fitted two alternative bifactor models, one where item Q10 belonged to the second subfactor, together with items Q5 - Q9, and one where item Q10 constituted its own, third subfactor. However, by all fit indices reported above, the original factor structure was the preferred one, if not by large margins. Looking at the content of the items (see Introduction), we can see that item Q10 is the only item that explicitly involves sex partners and difficulties to find sex partners, while the other items are not specific about sex partners. It could, therefore, be, that responses to item Q10 are not only influenced by sexual compulsivity, but also by a range of social and communicative abilities that might influence whether someone has difficulties finding sex partners or not. 
+
+
+
+
+```{r, code = readLines("analysis.R")}
+```
+

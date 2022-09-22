@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title></title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<pre><code class="r">require(ggplot2)
+require(ggthemes)
+require(reshape2)
+require(readxl)
+require(VIM)
+require(mice)
+require(dplyr)
+require(tidyr)
+require(psych)
+require(ggcorrplot)
+require(eRm)
+require(ltm)
+require(patchwork)
+require(difR)
+require(semPlot)
+require(lavaan)
+
+#####
+#part 1: data preparation, descriptive analyses
+#####
+{
+df = read_xlsx(&quot;SCS_data.xlsx&quot;)
+SCS_vars = names(df)[1:10]
+#set missing values
+print(table(df$gender))
+df$gender[df$gender == 3] = NA
+df[df==0] = NA
+
+print(unique(df$age))
+df$age[df$age &gt;= 100] = NA
+mean(df$age,na.rm=T)
+median(df$age,na.rm=T)
+min(df$age,na.rm=T)
+max(df$age,na.rm=T)
+
+sprintf(&quot;%i cases are incomplete&quot;,sum(!complete.cases(df)))
+sprintf(&quot;%i cases have incomplete SCS data&quot;,sum(!complete.cases(df[,SCS_vars])))
+
+
+#missing data motifs
+# and missing proportion per item
+pdf(&quot;missingplot.pdf&quot;,width = 8, height = 4)
+aggr(df[!complete.cases(df[,SCS_vars]),SCS_vars], 
+     numbers=TRUE, sortVars=TRUE,prop=FALSE,
+     labels=SCS_vars, 
+     ylab=c(&quot;#Cases Missing&quot;,&quot;Pattern&quot;))
+box(which = &quot;figure&quot;,lwd=2)
+dev.off()
+
+nmissing = rowSums(is.na(df[,SCS_vars]))
+table(nmissing[nmissing!=0])
+prop.table(table(nmissing[nmissing!=0]))
+
+#missing-at-random analysis
+#(check whether missing data points in each variable
+#can be jointly predicted by all the other variables)
+pvals = data.frame(matrix(ncol = length(SCS_vars), nrow=0))
+colnames(pvals) = SCS_vars
+for (var in SCS_vars){
+  formula = sprintf(&quot;I(is.na(%s)) ~ .&quot;, var)
+  formula0 = sprintf(&quot;I(is.na(%s)) ~ 1&quot;, var)
+  m = summary(glm(formula, data=df[,1:10]))$coefficients
+  pvals[var,rownames(m)[2:10]] = m[2:10,&quot;Pr(&gt;|t|)&quot;]
+}
+min(p.adjust(unlist(pvals), method=&quot;fdr&quot;),na.rm=T)
+
+</code></pre>
+
+<pre><code>## Error: &lt;text&gt;:68:0: unexpected end of input
+## 66: 
+## 67: 
+##    ^
+</code></pre>
+
+<pre><code class="r">#remove cases where more than two SCS variables are missing
+
+#15 cases removed
+df_clean = df[rowSums(is.na(df[,SCS_vars])) &lt;= 2,]
+
+#use multiple imputation for remaining data
+df_clean = complete(mice(df_clean))
+
+
+#descriptives
+df_clean[,1:10] %&gt;% summarise_all(list(mean=mean, median = median,
+                                       min = min, max = max)) %&gt;%
+  round(1) %&gt;%
+  gather(variable, value) %&gt;%
+  separate(variable, c(&quot;var&quot;, &quot;stat&quot;), sep = &quot;\\_&quot;) %&gt;%
+  spread(var, value) -&gt; descriptives
+
+#fix order of columns in descriptives table
+descriptives = descriptives[,c(&quot;stat&quot;,SCS_vars)]
+write.csv(descriptives, &quot;descriptives.csv&quot;)
+#re-calculate sum score
+df_clean$score = rowSums(df_clean[,1:10])
+
+#distribution plot before dichotomization
+tmp = melt(
+          cbind(data.frame(id=1:nrow(df_clean)),df_clean[,SCS_vars]),
+          id.vars=&quot;id&quot;)
+tmp2 = data.frame(table(tmp$variable,tmp$value))
+colnames(tmp2) = c(&quot;item&quot;,&quot;response&quot;,&quot;Freq&quot;)
+ggplot(tmp2,aes(x=item, y=Freq, fill=response))+geom_col()+theme_clean()
+ggsave(&quot;distroplot.pdf&quot;,width = 4,height = 2)
+
+#dichotomization
+dich = df_clean
+dich[,1:10] = data.frame(lapply(df_clean[,1:10], 
+                                function (x) as.numeric(x &gt; 2)))
+dich$score = rowSums(dich[,1:10])
+
+}
+
+#####
+#part 2: CTT-style item analysis
+#####
+{
+
+  #biserial correlations
+  biserial_cor = biserial(dich[,SCS_vars],dich[,SCS_vars])
+  ggcorrplot(biserial_cor, type = &quot;lower&quot;, lab = TRUE)+theme_clean()
+  ggsave(&quot;biserial_cor_mat.pdf&quot;,width = 6, height = 6)
+  #dichotomous item statistics (percent and N correct, discriminativity)
+  dich.distro = rbind(as.character(round(100*unlist(lapply(dich[,SCS_vars], 
+                                                           mean)),1)),
+                      as.character(as.integer(unlist(lapply(dich[,SCS_vars], 
+                                                            sum)))))
+  rownames(dich.distro) = c(&quot;item easiness\n(percent in category 1)&quot;, 
+                            &quot;number of cases in category 1&quot;)
+
+  discrimination = c()
+  for (item in 1:10){
+    itemname = SCS_vars[item]
+    discrimination[itemname] = as.character(round(biserial(
+      rowSums(dich[,-item]),dich[,item]),2))
+  }
+
+  dich.stats = rbind(dich.distro, discrimination)
+  write.csv(dich.stats,&quot;dich_stats.csv&quot;)
+}
+
+
+#####
+#part 2: estimate and analyze Rasch model
+#####
+{
+  #approach 1: eRm
+  #prepare data for eRm estimation
+  #(just item data in wide format)
+  rasch_model_eRm = RM(dich[,SCS_vars])
+
+  #approach 2: ltm
+  #constraint fixes item discriminativity to 1
+  rasch_model_ltm = rasch(dich[,SCS_vars],
+                          constraint = cbind(length(SCS_vars) + 1, 1))
+  smr_ltm = summary(rasch_model_ltm)
+
+
+
+  #TODO check syntax
+  #aproach 3: lavaan
+  #modified copy from https://jonathantemplin.com/wp-content/uploads/2022/02/
+                      #EPSY906_Example05_Binary_IFA-IRT_Models.nb.html
+  lavaansyntax = &quot;
+
+    # loadings/discrimination parameters:
+    SCS =~ 1*Q1 + 1*Q2 + 1*Q3 + 1*Q4 + 1*Q5 + 1*Q6 + 1*Q7 + 1*Q8 + 1*Q9 + 1*Q10
+
+    # threshholds use the | operator and start at value 1 after t:
+    Q1 | t1; Q2 | t1; Q3 | t1; Q4 | t1; Q5 | t1; Q6 | t1; Q7 | t1; 
+    Q8 | t1; Q9 | t1;Q10 | t1;
+
+    # factor mean:
+    SCS ~ 0;
+
+      # factor variance:
+    SCS ~~ 1*SCS
+
+    &quot;
+
+  rasch_model_lavaan = sem(model = lavaansyntax, data =  dich[,SCS_vars], 
+                           ordered = SCS_vars, mimic = &quot;Mplus&quot;,
+                           estimator = &quot;WLSMV&quot;, std.lv = TRUE, 
+                           parameterization = &quot;theta&quot;)
+  smr_lavaan = summary(rasch_model_lavaan, fit.measures = TRUE)
+
+  convertTheta2IRT = function(lavObject){
+    #modified copy from 
+    #https://jonathantemplin.com/wp-content/uploads/2022/02/
+        #EPSY906_Example05_Binary_IFA-IRT_Models.nb.html
+
+    if (!lavObject@Options$parameterization == &quot;theta&quot;) {
+      stop(&quot;your model is not estimated with parameterization=&#39;theta&#39;&quot;)
+      }
+
+    output = inspect(object = lavObject, what = &quot;est&quot;)
+    if (ncol(output$lambda)&gt;1) { stop(&quot;IRT conversion is only valid 
+             for one dimensional factor models. 
+             Your model has more than one dimension.&quot;)
+      }    
+    a = output$lambda
+    b = output$tau/output$lambda
+    return(list(a = a, b=b))
+  }
+
+  #make ICC plot function
+  ICC_plot = function(difficulty, discriminativity = 1){
+    if (length(discriminativity)==1){
+        discriminativity = rep(discriminativity, length(difficulty))
+      }
+    df = data.frame(x=seq(-6,6,.01))
+    for (i in 1:length(difficulty)){
+      df[[SCS_vars[i]]] = logistic(x=df$x, d=difficulty[i], 
+                                   a=discriminativity[i])
+    }
+
+    df = melt(df, id.vars = &quot;x&quot;)
+    colnames(df)[2] = &quot;item&quot;
+    plt=ggplot(df, aes(x = x, y = value, color = item, label = item)) + 
+      geom_line() + theme_clean() + xlab(&quot;Person parameter&quot;) + 
+      ylab(&quot;P(item solved)&quot;)
+    return(directlabels::direct.label(plt, &quot;last.qp&quot;))
+  }
+
+
+
+  #make ICC plots
+  difficulties_eRm = -rasch_model_eRm$betapar
+  iccplot_eRm=ICC_plot(difficulties_eRm)+ggtitle(&quot;eRm&quot;)
+
+
+
+  #lme4 difficulties are shifted by .42 from eRm difficulties, why?
+
+  difficulties_ltm = smr_ltm$coefficients[1:10,&quot;value&quot;]
+  iccplot_ltm = ICC_plot(difficulties_ltm)+ggtitle(&quot;ltm&quot;)
+
+
+  difficulties_lavaan =   convertTheta2IRT(lavObject = rasch_model_lavaan)$b
+
+  iccplot_lavaan=ICC_plot(difficulties_lavaan)+ggtitle(&quot;lavaan&quot;)
+
+
+
+  difficulties = rbind( data.frame(model=&quot;eRm&quot;,
+                            item=factor(SCS_vars),
+                            difficulty=as.numeric(difficulties_eRm)),
+                data.frame(model=&quot;ltm&quot;,
+                           item=factor(SCS_vars),
+                           difficulty=as.numeric(difficulties_ltm)),
+                data.frame(model=&quot;lavaan&quot;,
+                           item=factor(SCS_vars),
+                           difficulty=as.numeric(difficulties_lavaan)),
+                data.frame(model=&quot;CTT&quot;,
+                           item=factor(SCS_vars),
+                           difficulty=1-as.numeric(dich.distro[1,])/100))
+  difficulties_plot = ggplot(difficulties,aes(x=item,y=difficulty,
+                                              color=model,group=model)) + 
+    geom_point() + geom_line() + theme_clean() + ggtitle(&quot;model comparison&quot;)+
+    scale_x_discrete(breaks=SCS_vars,limits=SCS_vars)
+
+
+  difficulties_plot
+  ggsave(&quot;diffcfig.pdf&quot;,width = 4,height = 3)
+
+  #arrange plots vertically and save
+  iccplot_eRm|iccplot_ltm|iccplot_lavaan
+
+  ggsave(&quot;iccfig.pdf&quot;,width = 12,height = 3)
+
+
+  #compare fits
+    #select second line of output (corresponding to marginal MLE)
+  eRm_fit = IC(person.parameter(rasch_model_eRm))[[1]][2,]
+
+  ltm_fit = c()
+  ltm_fit[&#39;value&#39;] = smr_ltm$logLik
+  ltm_fit[&#39;npar&#39;] = 10
+  ltm_fit[&#39;AIC&#39;] = smr_ltm$AIC
+  ltm_fit[&#39;BIC&#39;] = smr_ltm$BIC
+  ltm_fit[&#39;cAIC&#39;] = NA
+
+  rasch_model_fits = rbind(eRm_fit,ltm_fit)
+  rownames(rasch_model_fits) = c(&quot;eRm&quot;,&quot;ltm&quot;)
+  colnames(rasch_model_fits)[1] = &quot;loglik&quot;
+  write.csv(rasch_model_fits,&quot;rasch_model_fits.csv&quot;)
+
+
+
+  #calculate loss per item
+
+  predict_responses = function(item_dffc,person_params,item_discr=1){
+    item_dffc = as.numeric(item_dffc)
+    if (length(item_discr)==1) item_discr = rep(item_discr,length(item_dffc))
+    person_params = as.numeric(person_params)
+    preds = matrix(nrow=length(person_params),ncol=length(item_dffc))
+    for (p in 1:length(person_params)){
+      for(i in 1:length(item_dffc)){
+        preds[p,i] = logistic(x=person_params[p],d = item_dffc[i], a = item_discr[i])
+    }}
+    return(preds)
+  }
+
+
+  #extract latent person abilities
+  person_params_eRm = person.parameter(rasch_model_eRm)$theta.table[,&quot;Person Parameter&quot;]
+  person_params_ltm=factor.scores(rasch_model_ltm,dich[,SCS_vars])[[1]][,&quot;z1&quot;]
+  person_params_lavaan = as.numeric(predict(rasch_model_lavaan))
+
+  #make predictions for individual persons and items
+  preds_ltm = predict_responses(difficulties_ltm,person_params_ltm)&gt;.5
+  preds_eRm = predict_responses(difficulties_eRm,person_params_eRm)&gt;.5
+  preds_lavaan = predict_responses(difficulties_lavaan,person_params_lavaan)&gt;.5
+
+
+  #calculate and plot mean 0-1-loss per item
+  itemloss_eRm = colMeans(dich[,SCS_vars]!=preds_eRm)
+  itemloss_ltm = colMeans(dich[,SCS_vars]!=preds_ltm)
+  itemloss_lavaan = colMeans(dich[,SCS_vars]!=preds_lavaan)
+  itemloss = rbind(data.frame(model=&quot;eRm&quot;,item=SCS_vars,loss=itemloss_eRm),
+                   data.frame(model=&quot;ltm&quot;,item=SCS_vars,loss=itemloss_ltm),
+                   data.frame(model=&quot;lavaan&quot;,item=SCS_vars,loss=itemloss_lavaan))
+
+  ggplot(itemloss,aes(x=item,y=loss,
+                          color=model,group=model)) + 
+    geom_point() + geom_line() + theme_clean() + ggtitle(&quot;0-1-loss\nmodel comparison&quot;)+
+    scale_x_discrete(breaks=SCS_vars,limits=SCS_vars)
+
+  ggsave(&quot;itemlossfig.pdf&quot;,width = 4,height = 3)
+
+  }
+
+#DIF
+{
+  data_dif_age = dich[,SCS_vars]
+  data_dif_age$age = dich$age &gt; median(dich$age)
+  dif_ageL = difLord(data_dif_age,&quot;age&quot;,FALSE,&quot;1PL&quot;)
+  dif_ageR = difRaju(data_dif_age,&quot;age&quot;,FALSE, &quot;1PL&quot;)
+
+
+  data_dif_gender= dich[,c(SCS_vars,&quot;gender&quot;)]
+  dif_genderL = difLord(data_dif_gender,&quot;gender&quot;,1, &quot;1PL&quot;)
+  dif_genderR = difRaju(data_dif_gender,&quot;gender&quot;,1, &quot;1PL&quot;)
+
+  difstats=data.frame(
+    p=-log10(p.adjust(
+      c(dif_genderL$p.value,dif_ageL$p.value),method=&quot;fdr&quot;)),
+    item = c(dif_genderL$names,dif_ageL$name),
+    groups = c(rep(&quot;gender&quot;,10),rep(&quot;age&quot;,10))
+    )
+
+
+  ggplot(difstats, aes(x=item, y=p, group=groups,col=groups)) + 
+    geom_point() + geom_line() + theme_clean() + ylab(&quot;-log10(p)&quot;)+
+    geom_hline(yintercept=-log10(.05))+scale_x_discrete(breaks=SCS_vars,
+                                                        limits=SCS_vars)
+
+  ggsave(&quot;DIF_pvals.pdf&quot;,width = 4,height = 3)
+  }
+
+#alternative model: 2PL
+{
+
+  #fit 1PL and 2PL, compare fit
+  twoPL_model = ltm(dich[,SCS_vars] ~ z1, IRT.param = TRUE)
+  difficulties_2PL = coef(twoPL_model)[,&quot;Dffclt&quot;]
+  discriminativities_2PL = coef(twoPL_model)[,&quot;Dscrmn&quot;]
+  ICC_2PL = ICC_plot(difficulty = difficulties_2PL,
+                     discriminativity = discriminativities_2PL)
+
+
+  Rasch_vs_twoPL_comparison = anova(rasch_model_ltm, twoPL_model)
+
+  difficulties_1vs2PL = rbind( data.frame(model=&quot;Rasch (1-PL)&quot;,
+                                   item=factor(SCS_vars),
+                                   difficulty=as.numeric(difficulties_ltm)),
+                        data.frame(model=&quot;Birnbaum (2-PL)&quot;,
+                                   item=factor(SCS_vars),
+                                   difficulty=as.numeric(difficulties_2PL)),
+                        data.frame(model=&quot;CTT&quot;,
+                                   item=factor(SCS_vars),
+                                   difficulty=as.numeric(dich.distro[1,])/100))
+  ggplot(difficulties_1vs2PL,aes(x=item,y=difficulty,
+                                                     color=model,group=model)) + 
+    geom_point() + geom_line() + theme_clean() + ggtitle(&quot;model comparison&quot;)+
+    scale_x_discrete(breaks=SCS_vars,limits=SCS_vars)
+  ggsave(&quot;difficulties_plot_2PL.pdf&quot;,width = 4,height = 3)
+
+
+  #calculate item-wise infit and outfit
+
+  get_outfit = function(ltm_model){
+    X=ltm_model$X
+    personscores = factor.scores(ltm_model,X)[[1]][,&quot;z1&quot;]
+    dffc = coef(ltm_model)[,&quot;Dffclt&quot;]
+    discr = coef(ltm_model)[,&quot;Dscrmn&quot;]
+    expected = predict_responses(dffc, personscores, discr)
+    var_X = expected * (1-expected)
+    Z_ij = (X-expected)/sqrt(var_X)
+    chisq = colSums(Z_ij**2)
+    #divide chisq by n
+    return(chisq/nrow(ltm_model$X))
+      }
+
+  get_infit = function(ltm_model){
+    X=ltm_model$X
+    personscores = factor.scores(ltm_model,X)[[1]][,&quot;z1&quot;]
+    dffc = coef(ltm_model)[,&quot;Dffclt&quot;]
+    discr = coef(ltm_model)[,&quot;Dscrmn&quot;]
+    expected = predict_responses(dffc, personscores, discr)
+    var_X = expected * (1-expected)
+    Z_ij = (X-expected)/sqrt(var_X)
+    infit = c()
+    for (i in 1:length(dffc)){
+      infit[i] = sum((var_X[,i] * (Z_ij[,i]**2))/sum(var_X[,i]))}
+    return(infit)
+  }
+
+  outfit_rasch = get_outfit(rasch_model_ltm)
+  outfit_2PL = get_outfit(twoPL_model)
+  infit_rasch = get_infit(rasch_model_ltm)
+  infit_2PL = get_infit(twoPL_model)
+
+  inoutfit = rbind(data.frame(model=&quot;Rasch&quot;,fit=&quot;outfit&quot;,
+                              item=names(outfit_rasch), value=outfit_rasch),
+                   data.frame(model=&quot;2-PL&quot;,fit=&quot;outfit&quot;,
+                              item=names(outfit_2PL), value=outfit_2PL),
+                   data.frame(model=&quot;Rasch&quot;,fit=&quot;infit&quot;,
+                              item=names(outfit_rasch),value=infit_rasch),
+                   data.frame(model=&quot;2-PL&quot;,fit=&quot;infit&quot;,
+                              item=names(outfit_2PL),value=infit_2PL))
+
+  ggplot(inoutfit,aes(x=item,y=value,
+                                 color=model,group=model)) + facet_wrap(~fit)+
+    geom_point() + geom_line() + theme_clean() + ggtitle(&quot;model comparison&quot;)+
+    scale_x_discrete(breaks=SCS_vars,limits=SCS_vars)
+  ggsave(&quot;inoutfit_plot_2PL.pdf&quot;,width = 8,height = 3)
+
+}
+
+#factorial models:
+{
+
+  covdat = cov(df_clean[,SCS_vars])
+  N=nrow(df_clean)
+
+  #unidimensional model
+  unidimensional_model &lt;- &#39;
+  xi1 =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+
+&#39;
+
+  unidimensional_cfa &lt;- cfa(unidimensional_model,
+                      sample.cov=covdat,
+                      sample.nobs=N,
+                      std.lv=T)
+
+
+  #correlated traits
+  correlated_traits_model &lt;- &#39;
+  xi1 =~ Q1+Q2+Q3+Q4+Q10
+  xi2 =~ Q5+Q6+Q7+Q8+Q9
+  xi1 ~~ xi2
+&#39;
+
+  correlated_traits_cfa &lt;- cfa(correlated_traits_model,
+                               sample.cov=covdat,
+                               sample.nobs=N,
+                               std.lv=T)
+
+
+  #bifactor model (general factor and two item-specific factors)
+  bifactor_model &lt;- &#39;
+  G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+  xi1 =~ Q1+Q2+Q3+Q4+Q10
+  xi2 =~ Q5+Q6+Q7+Q8+Q9
+  G ~~ 0*xi1
+  G ~~ 0*xi2
+  xi1 ~~ 0*xi2
+&#39;
+
+  bifactor_cfa &lt;- cfa(bifactor_model,
+              sample.cov=covdat,
+              sample.nobs=N,
+              std.lv=T)
+
+
+
+
+
+  #hierarchical model
+
+  hierarchical_model &lt;- &#39;
+  xi1 =~ Q1+Q2+Q3+Q4+Q10
+  xi2 =~ Q5+Q6+Q7+Q8+Q9
+  G =~ xi1+xi2
+&#39;
+
+  hierarchical_cfa &lt;- cfa(hierarchical_model,
+                      sample.cov=covdat,
+                      sample.nobs=N,
+                      std.lv=T)
+
+
+  cfaaov=anova(unidimensional_cfa, correlated_traits_cfa,
+        bifactor_cfa)
+
+  smr_hierarchical = summary(hierarchical_cfa, fit=T)$FIT
+
+  cfaaov_df = data.frame(model=c(&quot;hierarchical&quot;,&quot;bifactor&quot;,&quot;correlated traits&quot;,
+                                 &quot;unidimensional&quot;),
+                         AIC = c(smr_hierarchical[&quot;aic&quot;],cfaaov$AIC),
+                         BIC = c(smr_hierarchical[&quot;bic&quot;],cfaaov$BIC),
+                         p = c(NA,cfaaov$`Pr(&gt;Chisq)`))
+
+  write.csv(cfaaov_df,&quot;cfaaov_df.csv&quot;)
+  pdf(&quot;semplot_bifactor.pdf&quot;, width = 8,height = 4)
+  semPaths(bifactor_cfa, &quot;std&quot;)
+  dev.off()
+
+
+
+
+
+  #fit alternative bifactor model (item Q10 belongs to subscale 2)
+  bifactor_model_2 &lt;- &#39;
+  G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+  xi1 =~ Q1+Q2+Q3+Q4
+  xi2 =~ Q5+Q6+Q7+Q8+Q9+Q10
+  xi3 =~ Q10
+  G ~~ 0*xi1
+  G ~~ 0*xi2
+  xi1 ~~ 0*xi2
+  xi1 ~~ 0*xi3
+  xi2 ~~ 0*xi3
+  G ~~ 0*xi3
+
+&#39;
+
+  bifactor_cfa_2 &lt;- cfa(bifactor_model_2,
+                      sample.cov=covdat,
+                      sample.nobs=N,
+                      std.lv=T)
+
+  #fit alternative bifactor model (item Q10 is its own subscale)
+  #-&gt; does not converge
+  bifactor_model_3 &lt;- &#39;
+  G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+  xi1 =~ Q1+Q2+Q3+Q4
+  xi2 =~ Q5+Q6+Q7+Q8+Q9
+  G ~~ 0*xi1
+  G ~~ 0*xi2
+  xi1 ~~ 0*xi2
+
+&#39;
+
+  bifactor_cfa_3 &lt;- cfa(bifactor_model_3,
+                        sample.cov=covdat,
+                        sample.nobs=N,
+                        std.lv=T)
+
+
+  smr_bif1=summary(bifactor_cfa,fit=T)$FIT
+  smr_bif2=summary(bifactor_cfa_2,fit=T)$FIT
+  smr_bif3=summary(bifactor_cfa_3,fit=T)$FIT
+
+  print(rbind(smr_bif1,smr_bif2,smr_bif3))
+
+  }
+
+#reliability, unidimensionality
+{
+
+
+}
+
+#polytomous IRT model
+{
+  grm_model = grm(df_clean[,SCS_vars],constrained=T)
+  plot(grm_model)
+}
+</code></pre>
+
+<pre><code>## Error: &lt;text&gt;:39:1: unexpected &#39;}&#39;
+## 38: 
+## 39: }
+##     ^
+</code></pre>
+
+</body>
+
+</html>

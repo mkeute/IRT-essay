@@ -1,19 +1,22 @@
-library(ggplot2)
-library(ggthemes)
-library(reshape2)
-library(readxl)
-library(VIM)
-library(mice)
-library(dplyr)
-library(tidyr)
-library(psych)
-library(ggcorrplot)
-library(eRm)
-library(ltm)
-library(patchwork)
-library(difR)
-library(semPlot)
-library(lavaan)
+
+
+```r
+require(ggplot2)
+require(ggthemes)
+require(reshape2)
+require(readxl)
+require(VIM)
+require(mice)
+require(dplyr)
+require(tidyr)
+require(psych)
+require(ggcorrplot)
+require(eRm)
+require(ltm)
+require(patchwork)
+require(difR)
+require(semPlot)
+require(lavaan)
 
 #####
 #part 1: data preparation, descriptive analyses
@@ -64,8 +67,16 @@ for (var in SCS_vars){
 }
 min(p.adjust(unlist(pvals), method="fdr"),na.rm=T)
 
+```
 
-#-> missing at random can be assumed
+```
+## Error: <text>:68:0: unexpected end of input
+## 66: 
+## 67: 
+##    ^
+```
+
+```r
 #remove cases where more than two SCS variables are missing
 
 #15 cases removed
@@ -439,7 +450,6 @@ dich$score = rowSums(dich[,1:10])
   covdat = cov(df_clean[,SCS_vars])
   N=nrow(df_clean)
   
-  
   #unidimensional model
   unidimensional_model <- '
   xi1 =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
@@ -497,31 +507,19 @@ dich$score = rowSums(dich[,1:10])
                       sample.nobs=N,
                       std.lv=T)
   
-  # 
+  
+  cfaaov=anova(unidimensional_cfa, correlated_traits_cfa,
+        bifactor_cfa)
+  
   smr_hierarchical = summary(hierarchical_cfa, fit=T)$FIT
-  smr_bifactor = summary(bifactor_cfa, fit=T)$FIT
-  smr_correlated_traits = summary(correlated_traits_cfa, fit=T)$FIT
-  smr_unidimensional = summary(unidimensional_cfa, fit=T)$FIT
-# 
-#   cfaaov_df = data.frame(model=c("hierarchical","bifactor","correlated traits",
-#                                  "unidimensional"),
-#                          Df = c(smr_hierarchical["df"],
-#                                 smr_bifactor["df"],
-#                                 smr_correlated_traits["df"],
-#                                 smr_unidimensional["df"]),
-#                          AIC = c(smr_hierarchical["aic"],
-#                                  smr_bifactor["aic"],
-#                                  smr_correlated_traits["aic"],
-#                                  smr_unidimensional["aic"]),
-#                          BIC = c(smr_hierarchical["bic"],
-#                                  smr_bifactor["bic"],
-#                                  smr_correlated_traits["bic"],
-#                                  smr_unidimensional["bic"]))
-# 
-#   write.csv(cfaaov_df,"cfaaov_df.csv")
   
+  cfaaov_df = data.frame(model=c("hierarchical","bifactor","correlated traits",
+                                 "unidimensional"),
+                         AIC = c(smr_hierarchical["aic"],cfaaov$AIC),
+                         BIC = c(smr_hierarchical["bic"],cfaaov$BIC),
+                         p = c(NA,cfaaov$`Pr(>Chisq)`))
   
-  
+  write.csv(cfaaov_df,"cfaaov_df.csv")
   pdf("semplot_bifactor.pdf", width = 8,height = 4)
   semPaths(bifactor_cfa, "std")
   dev.off()
@@ -587,7 +585,12 @@ dich$score = rowSums(dich[,1:10])
   grm_model = grm(df_clean[,SCS_vars],constrained=T)
   plot(grm_model)
 }
+```
 
-
-
+```
+## Error: <text>:39:1: unexpected '}'
+## 38: 
+## 39: }
+##     ^
+```
 
