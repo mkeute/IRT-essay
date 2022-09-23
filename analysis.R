@@ -14,6 +14,7 @@ library(patchwork)
 library(difR)
 library(semPlot)
 library(lavaan)
+library(semTools)
 
 #####
 #part 1: data preparation, descriptive analyses
@@ -111,10 +112,10 @@ dich$score = rowSums(dich[,1:10])
 #####
 {
   
-  #biserial correlations
-  biserial_cor = biserial(dich[,SCS_vars],dich[,SCS_vars])
-  ggcorrplot(biserial_cor, type = "lower", lab = TRUE)+theme_clean()
-  ggsave("biserial_cor_mat.pdf",width = 6, height = 6)
+  #tetrachoric correlations
+  tetra_cor = tetrachoric(dich[,SCS_vars])
+  ggcorrplot(tetra_cor$rho, type = "lower", lab = TRUE)+theme_clean()
+  ggsave("tetrachoric_cor_mat.pdf",width = 6, height = 6)
   #dichotomous item statistics (percent and N correct, discriminativity)
   dich.distro = rbind(as.character(round(100*unlist(lapply(dich[,SCS_vars], 
                                                            mean)),1)),
@@ -136,8 +137,10 @@ dich$score = rowSums(dich[,1:10])
 
 
 #####
-#part 2: estimate and analyze Rasch model
+#part 3: estimate and analyze Rasch model
 #####
+
+#model fitting
 {
   #approach 1: eRm
   #prepare data for eRm estimation
@@ -433,7 +436,25 @@ dich$score = rowSums(dich[,1:10])
   
 }
 
-#factorial models:
+#polytomous IRT model
+{
+  grm_constrained = grm(df_clean[,SCS_vars],constrained=T)
+  grm_unconstrained = grm(df_clean[,SCS_vars],constrained=F)
+  anova(grm_constrained, grm_unconstrained)
+  
+  #have to save this plot by hand, automatic saving does
+  #not work for some reason
+  plot(grm_unconstrained, item=2, ask=F)
+  
+  plot(grm_unconstrained, type="IIC", ask=F,legend=T,cx='topleft',cex=.5)
+  
+}
+
+#####
+#part 4: factorial structure of the data
+#####
+
+#factor analyses
 {
   
   covdat = cov(df_clean[,SCS_vars])
@@ -472,7 +493,6 @@ dich$score = rowSums(dich[,1:10])
   xi2 =~ Q5+Q6+Q7+Q8+Q9
   G ~~ 0*xi1
   G ~~ 0*xi2
-  xi1 ~~ 0*xi2
 '
   
   bifactor_cfa <- cfa(bifactor_model,
@@ -502,26 +522,26 @@ dich$score = rowSums(dich[,1:10])
   smr_bifactor = summary(bifactor_cfa, fit=T)$FIT
   smr_correlated_traits = summary(correlated_traits_cfa, fit=T)$FIT
   smr_unidimensional = summary(unidimensional_cfa, fit=T)$FIT
-# 
-#   cfaaov_df = data.frame(model=c("hierarchical","bifactor","correlated traits",
-#                                  "unidimensional"),
-#                          Df = c(smr_hierarchical["df"],
-#                                 smr_bifactor["df"],
-#                                 smr_correlated_traits["df"],
-#                                 smr_unidimensional["df"]),
-#                          AIC = c(smr_hierarchical["aic"],
-#                                  smr_bifactor["aic"],
-#                                  smr_correlated_traits["aic"],
-#                                  smr_unidimensional["aic"]),
-#                          BIC = c(smr_hierarchical["bic"],
-#                                  smr_bifactor["bic"],
-#                                  smr_correlated_traits["bic"],
-#                                  smr_unidimensional["bic"]))
-# 
-#   write.csv(cfaaov_df,"cfaaov_df.csv")
-  
-  
-  
+
+  cfaaov_df = data.frame(model=c("hierarchical","bifactor","correlated traits",
+                                 "unidimensional"),
+                         Df = c(smr_hierarchical["df"],
+                                smr_bifactor["df"],
+                                smr_correlated_traits["df"],
+                                smr_unidimensional["df"]),
+                         AIC = c(smr_hierarchical["aic"],
+                                 smr_bifactor["aic"],
+                                 smr_correlated_traits["aic"],
+                                 smr_unidimensional["aic"]),
+                         BIC = c(smr_hierarchical["bic"],
+                                 smr_bifactor["bic"],
+                                 smr_correlated_traits["bic"],
+                                 smr_unidimensional["bic"]))
+
+  write.csv(cfaaov_df,"cfaaov_df.csv")
+
+
+
   pdf("semplot_bifactor.pdf", width = 8,height = 4)
   semPaths(bifactor_cfa, "std")
   dev.off()
@@ -535,13 +555,8 @@ dich$score = rowSums(dich[,1:10])
   G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
   xi1 =~ Q1+Q2+Q3+Q4
   xi2 =~ Q5+Q6+Q7+Q8+Q9+Q10
-  xi3 =~ Q10
   G ~~ 0*xi1
   G ~~ 0*xi2
-  xi1 ~~ 0*xi2
-  xi1 ~~ 0*xi3
-  xi2 ~~ 0*xi3
-  G ~~ 0*xi3
 
 '
   
@@ -556,9 +571,10 @@ dich$score = rowSums(dich[,1:10])
   G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
   xi1 =~ Q1+Q2+Q3+Q4
   xi2 =~ Q5+Q6+Q7+Q8+Q9
+  xi3 =~ Q10
   G ~~ 0*xi1
   G ~~ 0*xi2
-  xi1 ~~ 0*xi2
+  G ~~ 0*xi3
 
 '
   
@@ -567,27 +583,156 @@ dich$score = rowSums(dich[,1:10])
                         sample.nobs=N,
                         std.lv=T)
   
+  bifactor_model_4 <- '
+  G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+  xi1 =~ Q1+Q2+Q3+Q4
+  xi2 =~ Q5+Q6+Q7+Q8+Q9
+  xi3 =~ Q10+Q6+Q1
+  G ~~ 0*xi1
+  G ~~ 0*xi2
+  G ~~ 0*xi3
+
+'
+  
+  bifactor_cfa_4<- cfa(bifactor_model_4,
+                        sample.cov=covdat,
+                        sample.nobs=N,
+                        std.lv=T)
+  
+  
+  pdf("semplot_bifactor_automatic.pdf", width = 8,height = 4)
+  semPaths(bifactor_cfa_4, "std")
+  dev.off()
+  
   
   smr_bif1=summary(bifactor_cfa,fit=T)$FIT
   smr_bif2=summary(bifactor_cfa_2,fit=T)$FIT
   smr_bif3=summary(bifactor_cfa_3,fit=T)$FIT
+  smr_bif4=summary(bifactor_cfa_4,fit=T)$FIT
   
-  print(rbind(smr_bif1,smr_bif2,smr_bif3))
+  bif_comparison=rbind(smr_bif1,smr_bif2,smr_bif3,smr_bif4)[,c("npar","aic",
+                                                               "bic","cfi",
+                                                               "tli","srmr",
+                                                               "rmsea")]
+  rownames(bif_comparison) = c("Bifactor (original)", 
+                               "Bifactor (Alternative 1)", 
+                               "Bifactor (Alternative 2)",
+                               "Bifactor (Automatized)")
+  write.csv(bif_comparison, "bifactor_comparison.csv")
   
   }
 
 #reliability, unidimensionality
 {
+  twofrel = round(semTools::reliability(bifactor_cfa)[-5,],2)
+  twofrel = cbind(twofrel,NA)
+  twofrel = cbind(twofrel, "two-factor")
+  colnames(twofrel) = c("G", "xi_1","xi_2","xi_3","model")
+  rownames(twofrel) = c("alpha","omega","omega_2","omega_3")
   
+  threefrel = round(semTools::reliability(bifactor_cfa_4)[-5,],2)
+  threefrel = cbind(threefrel,"three-factor")
+  colnames(threefrel) = colnames(twofrel)
+  rownames(threefrel) = rownames(twofrel)
   
-}
+  write.csv(rbind(twofrel,threefrel),
+            file="composite_reliability.csv")
+  
 
-#polytomous IRT model
+  }
+
+#measurement invariance
 {
-  grm_model = grm(df_clean[,SCS_vars],constrained=T)
-  plot(grm_model)
-}
+  
+  #fit MI models
+  gender_configural = cfa(bifactor_model,
+                          data=df_clean[,c(SCS_vars,"gender")],
+                          group="gender")
+  gender_weak = cfa(bifactor_model,
+                          data=df_clean[,c(SCS_vars,"gender")],
+                          group="gender",
+                          group.equal=c("loadings") )
+  gender_strong = cfa(bifactor_model,
+                    data=df_clean[,c(SCS_vars,"gender")],
+                    group="gender",
+                    group.equal=c("loadings","intercepts") )
+  gender_strict = cfa(bifactor_model,
+                      data=df_clean[,c(SCS_vars,"gender")],
+                      group="gender",
+                      group.equal=c("loadings","intercepts","residuals") )
+  
 
+
+  mi_gender_modelcomp = anova(gender_configural,
+                              gender_weak,
+                              gender_strong,
+                              gender_strict)
+  
+  mi_gender_compout=data.frame(cbind(DF=mi_gender_modelcomp$Df,
+                          AIC=mi_gender_modelcomp$AIC,
+                          BIC=mi_gender_modelcomp$BIC,
+        Chisq=mi_gender_modelcomp$Chisq,
+        Chisq_diff=mi_gender_modelcomp$`Chisq diff`,
+        DF_diff=mi_gender_modelcomp$`Df diff`,
+        p=mi_gender_modelcomp$`Pr(>Chisq)`))
+  rownames(mi_gender_compout) = c("configural MI",
+                                  "weak MI",
+                                  "strong MI",
+                                  "strict MI")
+  write.csv(mi_gender_compout,"mi_gender_compout.csv")
+  
+  
+  
+  df_agegroups = df_clean[,c(SCS_vars)]
+  df_agegroups$age = df_clean$age > median(df_clean$age)
+  age_configural = cfa(bifactor_model_4,
+                          data=df_agegroups[,c(SCS_vars,"age")],
+                          group="age")
+  age_weak = cfa(bifactor_model_4,
+                    data=df_agegroups[,c(SCS_vars,"age")],
+                    group="age",
+                    group.equal=c("loadings") )
+  age_strong = cfa(bifactor_model_4,
+                      data=df_agegroups[,c(SCS_vars,"age")],
+                      group="age",
+                      group.equal=c("loadings","intercepts") )
+  age_strict = cfa(bifactor_model_4,
+                      data=df_agegroups[,c(SCS_vars,"age")],
+                      group="age",
+                      group.equal=c("loadings","intercepts","residuals") )
+  
+  mi_age_modelcomp = anova(age_configural,
+                              age_weak,
+                              age_strong,
+                              age_strict)
+  
+  mi_age_compout=data.frame(cbind(DF=mi_age_modelcomp$Df,
+                                     AIC=mi_age_modelcomp$AIC,
+                                     BIC=mi_age_modelcomp$BIC,
+                                     Chisq=mi_age_modelcomp$Chisq,
+                                     Chisq_diff=mi_age_modelcomp$`Chisq diff`,
+                                     DF_diff=mi_age_modelcomp$`Df diff`,
+                                     p=mi_age_modelcomp$`Pr(>Chisq)`))
+  rownames(mi_age_compout) = c("configural MI",
+                                  "weak MI",
+                                  "strong MI",
+                                  "strict MI")
+  write.csv(mi_age_compout,"mi_age_compout.csv")
+  
+  
+  #factor structure (just a reminder for
+  #modification index interpretation):
+  # G =~ Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10
+  # xi1 =~ Q1+Q2+Q3+Q4
+  # xi2 =~ Q5+Q6+Q7+Q8+Q9
+  # xi3 =~ Q10+Q6+Q1
+  
+  #look at mod. indices of strong invariance model
+  modindices(gender_weak)
+  modindices(age_weak)
+  
+  
+}
 
 
 
