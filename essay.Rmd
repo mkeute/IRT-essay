@@ -50,25 +50,25 @@ Understanding sexual habits and behavior can be important for, e.g., improving s
 
 The 10 items are (@kalichman2001sexual):
 
-1.  My sexual appetite has gotten in the way of my relationships.
+Q1.  My sexual appetite has gotten in the way of my relationships.
 
-2.  My sexual thoughts and behaviors are causing problems in my life.
+Q2.  My sexual thoughts and behaviors are causing problems in my life.
 
-3.  My desires to have sex have disrupted my daily life.
+Q3.  My desires to have sex have disrupted my daily life.
 
-4.  I sometimes fail to meet my commitments and responsibilities because of my sexual behaviors.
+Q4.  I sometimes fail to meet my commitments and responsibilities because of my sexual behaviors.
 
-5.  I sometimes get so horny I could lose control.
+Q5.  I sometimes get so horny I could lose control.
 
-6.  I find myself thinking about sex while at work.
+Q6.  I find myself thinking about sex while at work.
 
-7.  I feel that sexual thoughts and feelings are stronger than I am.
+Q7.  I feel that sexual thoughts and feelings are stronger than I am.
 
-8.  I have to struggle to control my sexual thoughts and behavior.
+Q8.  I have to struggle to control my sexual thoughts and behavior.
 
-9.  I think about sex more than I would like to.
+Q9.  I think about sex more than I would like to.
 
-10. It has been difficult for me to find sex partners who desire having sex as much as I want to.
+Q10. It has been difficult for me to find sex partners who desire having sex as much as I want to.
 
 In this essay, using data from the original validation cohort (@kalichman2001sexual), I will provide a thorough analysis of the SCS, using methods derived from Item Response Theory (IRT), and to a lesser extent from Classical Test Theory (CTT). In the final section, I will give an overview over both theories and their key differences.
 
@@ -76,15 +76,15 @@ In this essay, using data from the original validation cohort (@kalichman2001sex
 
 # Preparing the Data
 
-The dataset (@kalichman1995sexual) consists of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher appeared implausible and therefore set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" (other) were set to missing values. Of the remaining cases, 2295 (68.5%) reported male gender ("1") and 1053 (31.4%) reported female gender ("2"). In the dataset, 133 cases contained at least one missing value.
+The dataset (@kalichman1995sexual, available at http://openpsychometrics.org/_rawdata/SCS.zip) consists of 3376 observations, the variables being the ten items of the SCS, the sum score, gender and age. From the age variable, three cases where the reported age was 100 years or higher appeared implausible and therefore set to missing values. The remaining cases had a mean age of 30.9 years (median 28 years, range [14, 85]). From the gender variable, 13 values were missing and 15 cases where the reported gender was "3" (other) were set to missing values. Of the remaining cases, 2295 (68.5%) reported male gender ("1") and 1053 (31.4%) reported female gender ("2"). In the dataset, 133 cases contained at least one missing value.
 
 The pattern of missing SCS items is shown in Figure \@ref(fig:missing-plot). It can be seen that item Q9 was missing most often, though not by a large margin (Q9: 27 missing values, Q5: 13 missing values). It can be seen that the majority of cases with missing values (118 cases / 88.7%) had only a single missing item, while there were no prominent patterns of items that tended to be jointly missing. Eight cases where more than two SCS items were missing were excluded from all further analyses. For the remaining 3368 cases, the probability of missing values at each SCS variable was modeled as a function of the values in *all other* SCS variables using a logistic regression model:
 
-$P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta})$,
+$P(M_{i,q} = 1|X_{i,\not q}) = \sigma(X_{i,\not q} \hat{\beta}_{\not q})$,
 
-where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$, $X_{i,\not q}$ denotes the item values of all other items except item $q$, $\sigma$ is the logistic function $\sigma(x) = \frac{1}{1-e^{-x}}$, and $\hat{\beta}$ are the estimated regression weights (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since those cases were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
+where $M_{i,q}$ is 1 if the $i^{th}$ person has a missing value at item $q \in \{Q1, Q2, ... Q10\}$ and 0 otherwise, $X_{i,\not q}$ denotes the item values of all other items except item $q$, $\sigma$ is the logistic function $\sigma(x) = \frac{1}{1-e^{-x}}$, and $\hat{\beta}_{\not q}$ are the estimated regression weights based on all other items (@guan2011missing). Note that each variable's pattern of missing values could only be predicted based on the observations without missing values in any other variable, since cases with any missing values were excluded by the logistic model by default of the implementation. Since the majority of cases had either no or only one variable missing, however, this should not bias the overall picture very much.
 
-```{r missing-plot,  echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
+```{r missing-plot,  echo=FALSE, out.width="70%", fig.align = 'center', fig.cap="Pattern of missing SCS values."}
 knitr::include_graphics("missingplot.pdf")
 ```
 
@@ -92,9 +92,9 @@ knitr::include_graphics("missingplot.pdf")
 
 # Descriptive Analyses and Dichotomization
 
-The distribution of responses for each item before dichotomization can be seen in Figure \@ref(fig:distroplot). All item categories show reasonable coverage of the range of responses (1-4), and there are no obvious flooring or ceiling effects, except for a slight tendency to a flooring effect with item Q6 (few cases with response 1).
+The distribution of responses for each item before dichotomization can be seen in Figure \@ref(fig:distroplot). All item categories show reasonable coverage of the range of responses (1-4), and there are no obvious flooring or ceiling effects, except for a potential ceiling tendency with item Q6 (few cases with response 1, many with response 4).
 
-```{r distroplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Distribution of non-dichotomized responses per item"}
+```{r distroplot, echo=FALSE, out.width="70%", fig.align = 'center', fig.cap="Distribution of non-dichotomized responses per item"}
 knitr::include_graphics("distroplot.pdf")
 ```
 
@@ -115,7 +115,7 @@ Descriptive characteristics of the 10 SCS items are shown in Table \@ref(tab:des
 
  Moreover, I calculated item discrimination, i.e., each items ability to discriminate between high- and low-scoring individuals, using the adjusted item-total correlation method (@reynolds2021mastering), i.e., by calculating biserial correlation coefficients between each (dichotomized) item's scores and the sum of all other (dichotomized) items.
 
-Tetrachoric item intercorrelations are shown in Figure \@ref(fig:biserialcorplot). It can be seen that all pairs of items show moderate to high positive correlations, indicating that all items measure similar information yet are not redundant (see below for further scrutiny of factorial structure). Item easiness (i.e., proportion of correct responses) was between 27% (item Q4) and 71.9% (item Q6), item discrimination was between .26 (item Q6) and .45 (items Q1, Q2), i.e., there was no item with a trivial response pattern (e.g., all or no responses correct), and no item was a good representation of the entire scale, since all item discriminations were only moderate in size.
+Tetrachoric intercorrelations of the (dichotomized) items are shown in Figure \@ref(fig:biserialcorplot). It can be seen that all pairs of items show moderate to high positive correlations, indicating that all items measure similar information yet are not redundant (see below for further scrutiny of factorial structure). Item easiness (i.e., proportion of correct responses) was between 27% (item Q4) and 71.9% (item Q6), item discrimination was between .26 (item Q6) and .45 (items Q1, Q2), i.e., there was no item with a trivial response pattern (e.g., all or no responses correct), and no item was, in and of itself, a very good representation of the entire scale, since all item discriminations were only moderate in size.
 
 ```{r descriptivestab, echo=FALSE}
 descriptives=read.csv("descriptives.csv")
@@ -124,16 +124,18 @@ knitr::kable(descriptives, caption = "Descriptive item statistics (mean, median 
 
 ```{r dichdistrotab, echo=FALSE}
 dich.stats = read.csv("dich_stats.csv")
-knitr::kable(dich.stats, caption = "Distribution and discrimination of dichotomized items")
+kableExtra::kable_styling(knitr::kable(dich.stats, caption = "Distribution and discrimination of dichotomized items"),latex_options = c("striped", "scale_down"))
+
+
 ```
 
-```{r biserialcorplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Tetrachoric intercorrelations between items."}
+```{r biserialcorplot, echo=FALSE, out.width="80%", fig.align = 'center', fig.cap="Tetrachoric intercorrelations between items."}
 knitr::include_graphics("tetrachoric_cor_mat.pdf")
 ```
 
 \newpage
 
-# IRT modeling
+# Rasch models
 
 After analyzing the SCS data using descriptive statistics and concepts derived from CTT, in the following I will fit and discuss different IRT models to the data.
 
@@ -145,7 +147,7 @@ It models a given person's chances of solving a given item as a logistic functio
 
 The probability for a given person can then be expressed by the logistic function: $P(D_{i,q} = 1 | \beta_q, \theta_i) = \sigma(\theta_i - \beta_q)$, where $\sigma$ is the logistic function as specified above. That is to say, it is purely the difference between item difficulty and person ability that explains the correctness of item responses within the model.
 
-Crucially, the model assumes that this relationship is identical for all items, i.e., the logistic function can only be shifted but not changed in slope across items with different difficulty. Item difficulty is, therefore, the only free parameter of the Rasch model, whereas alternative models (see below) also estimate additional parameters.
+Crucially, Rasch model assumes that this relationship is identical for all items, i.e., the logistic function can only be shifted in threshold, but not changed in slope across items with different difficulty. Item difficulty is, therefore, the only free parameter of the Rasch model, whereas alternative models (see below) also estimate additional parameters.
 
 To obtain a comprehensive picture, I fitted Rasch models using three different software implementations in `R` 4.1.
 
@@ -172,7 +174,7 @@ Again, I fixed item discriminativities to 1 for all items. The item parameters `
 
 The item difficulty parameters of the three models are shown in Figure \@ref(fig:difficultyplot), along with the item difficulty derived from CTT (i.e., the proportion of incorrect responses per item in the data). While the parameters differed between the different models, it is important to note that the parameters from all four models (including CTT) were perfectly correlated for all pairs of models (all r \> .999), which indicates that the parameters of one model are simply affine linear transformations of the parameters of any other model, i.e., while numerically different, the models incorporated identical information about the items. The corresponding item-characteristic curves (ICC) are shown in Figure \@ref(fig:iccplot). ICCs are generated by calculating the function graph of the item-wise logistic functions parameterized by item difficulty, across a range of possible person ability values on the x-axis.
 
-```{r difficultyplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Item difficulties in comparison."}
+```{r difficultyplot, echo=FALSE, out.width="70%", fig.align = 'center', fig.cap="Item difficulties in comparison."}
 knitr::include_graphics("diffcfig.pdf")
 ```
 
@@ -180,19 +182,19 @@ knitr::include_graphics("diffcfig.pdf")
 knitr::include_graphics("iccfig.pdf")
 ```
 
-The overall model fit indices are shown in Table\@ref(tab:modelfittab). Of note, log-likelihood and information criteria can only be reported for those models fitted using `ltm` and `eRm`, while the `lavaan` model's fit indices are not comparable, as it was not fitted using maximum likelihood estimation. For brevity, I skip the discussion of the `lavaan` model fit indices. Comparing the fit indices for the `ltm` and `eRm` Rasch models, it can be seen that `eRm` had an overall higher log-likelihood. Since it also had one free parameter less (because of the sum constraint, see above), it was, overall, the preferred model also according to the Akaike and Bayes-Schwarz information criteria.
+The overall likelihood-based model fit indices are shown in Table\@ref(tab:modelfittab). Of note, log-likelihood and information criteria can only be reported for those models fitted using `ltm` and `eRm`, while the `lavaan` model's fit indices are not comparable, as it was not fitted using maximum likelihood estimation. For brevity, I skip the discussion of the `lavaan` model fit indices. Comparing the fit indices for the `ltm` and `eRm` Rasch models, it can be seen that `eRm` had an overall higher log-likelihood. Since it also had one free parameter less (because of the sum constraint, see above), it was, overall, the preferred model also according to the Akaike and Bayes-Schwarz information criteria.
 
 ```{r modelfittab, echo=FALSE}
 rasch_model_fits = read.csv("rasch_model_fits.csv")
 knitr::kable(rasch_model_fits, caption = "Fit indices for Rasch models")
 ```
 
-Finally, to get an impression of how the three models perform for each item, I calculated the mean 0-1-loss per item as:
+Finally, to get an impression of how the three models perform for each item, I calculated the mean 0-1-loss per item, compared to the actual, dichotomized data $D_{i,q}$, as:
 
 ```{=latex}
 $\mathcal{L}_{q} = \frac{1}{n} \sum_{i=1}^n |f(\theta_i,\beta_q) - D_{i,q}|$
 ```
-that is to say, I used the item difficulty parameters $\beta_q$ and person ability scores $\theta_i$ estimated by the models to make predictions for each person and item:
+that is to say, I used the item difficulty parameters $\beta_q$ and person ability scores $\theta_i$ estimated by the models to predict the expected response for each person and item:
 
 ```{=latex}
 $$
@@ -203,17 +205,17 @@ f(\theta_i,\beta_q) =: \begin{cases}
 \end{cases}
 $$
 ```
-The mean loss is then calculated as the proportion of incorrectly predicted cases for each item. It is shown in Figure \@ref(fig:itemlossplot). It can be seen that the three models, despite differences in parameterization, performed very similarly, with the `eRm` and `lavaan` models performing almost identically, whereas the `ltm` model tended to incur a slightly higher loss, except for items Q6 and Q10. Interestingly, these are the most difficult items, and the fact `ltm` outperformed `eRm` especially for those items might be related to the differences between conditional vs. marginal maximum likelihood estimation, which have the strongest effect in cases where either all or no responses are correct, i.e., for particularly easy or difficult items.
+The mean loss is then calculated as the proportion of incorrectly predicted cases for each item. It is shown in Figure \@ref(fig:itemlossplot). It can be seen that the three models, despite differences in parameterization, performed very similarly, with the `eRm` and `lavaan` models performing almost identically, whereas the `ltm` model tended to incur a slightly higher loss, except for items Q6 and Q10. Interestingly, these are the most difficult items, and the fact that `ltm` outperformed `eRm` especially for those items might be related to the differences between conditional vs. marginal maximum likelihood estimation, which have the strongest effect in cases where either all or no responses are correct, i.e., for particularly easy or difficult items.
 
-```{r itemlossplot, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="Mean 0-1-loss (proportion of incorrectly predicted responses) per item."}
+```{r itemlossplot, echo=FALSE, out.width="70%", fig.align = 'center', fig.cap="Mean 0-1-loss (proportion of incorrectly predicted responses) per item."}
 knitr::include_graphics("itemlossfig.pdf")
 ```
 
 ## Differential Item Functioning
 
-I tested for differential item functioning (DIF) using the package `difR` and the procedure outlined in the companion paper (@magis2010general). DIF is a disadvantageous property of a Rasch model, meaning that item responses differ between subjects from different participant groups, even given the same estimated ability level. The presence of DIF indicates a lack of measurement invariance of the model. The results are displayed in \@ref(fig:diffig). I used the `difLord` method to investigate DIF, but obtained essentially the same results with the `difRaju` method. I discarded `difLRT`, the third recommended IRT-related method, due to its high computational demand. I tested for DIF across genders (male vs. female) and age groups (above median age vs. smaller or equal to median age). Significant DIF (FDR-corrected p-value \< .05) across the gender groups was detected for items Q5 and Q10, and across the age groups for item Q1, Q5, and Q10. However, the effect sizes were in the negligible range for all but item Q5 in the gender group comparison, where a moderate effect was detected ($\Delta_{Lord} = -1.14$). Since I have only been considering Rasch (one-parameter) models so far, this analysis only tested for uniform DIF.
+I tested for differential item functioning (DIF) using the package `difR` and the procedure outlined in the companion paper (@magis2010general). DIF is a disadvantageous property of a Rasch model, meaning that item responses differ between subjects from different participant groups, even given the same estimated ability level. The presence of DIF indicates a lack of measurement invariance of the model. The results are displayed in \@ref(fig:diffig). I used the `difLord` method to investigate DIF, but obtained essentially the same results with the `difRaju` method. I discarded `difLRT`, the third recommended IRT-related method, due to its high computational demand. I tested for DIF across genders (male vs. female) and age groups (above median age vs. smaller or equal to median age). Significant DIF (FDR-corrected p-value \< .05) across the gender groups was detected for items Q5 and Q10, and across the age groups for item Q1, Q5, and Q10. However, the effect sizes were in the negligible range for all but item Q5 in the gender group comparison, where a moderate effect was detected ($\Delta_{Lord} = -1.14$). Item Q5 reads 'I sometimes get so horny I could lose control', and it appears plausible that DIF for this item could emerge by gender-specific societal norms, and possibly gender-specific consequences of 'being horny' for everyday functioning. Since I have only been considering Rasch (one-parameter) models so far, this analysis only tested for uniform DIF.
 
-```{r diffig, echo=FALSE, out.width="50%", fig.align = 'center', fig.cap="p-values (FDR corrected, negative log-transformed) from DIF analysis. Black line: significance threshold (p < .05)"}
+```{r diffig, echo=FALSE, out.width="70%", fig.align = 'center', fig.cap="p-values (FDR corrected, negative log-transformed) from DIF analysis. Black line: significance threshold (p < .05)"}
 knitr::include_graphics("DIF_pvals.pdf")
 ```
 
@@ -346,7 +348,7 @@ It can be seen that the estimated reliability differs substantially between scor
 
 As a last step in data analysis, I investigated measurement invariance of the SCS data. Measurement invariance means that the factorial structure is independent of other variables that are not part of the structure. In particular, I tested whether or not the three-subfactor bifactorial structure was identical across genders and age groups, similar to the analysis of DIF (see above). Following the procedure outlined in @xu2012multiple and @van2012checklist, I compared four models with increasingly strict measurement invariance assumptions. The *first* model assumes *configural invariance*, i.e., model parameters can vary freely in each group, and no assumption about invariance between the groups is made. The *second* model assumes *weak invariance* or *metric invariance*, i.e., equal factor loadings across groups. The *third* model assumes *strong invariance* or *scalar invariance*, where factor loadings and item intercepts are assumed to be equal across groups. The final model assumes *strict* invariance, where, additionally, item residual variances are assumed to be equal across groups. Of note, I had to use the two-subfactor bifactorial structure to test for gender measurement invariance, and the three-subfactor bifactorial structure to test for age group measurement invariance, since otherwise, there would have been always one or several models that did not converge.
 
-For gender, the overall preferred model was the one with weak invariance (see Table \@ref(tab:migendertab)), while  and Table \@ref(tab:miagetab)). 
+For gender, the overall preferred model was the one with weak invariance (see Table \@ref(tab:migendertab)), while for age, eithert the model with weak or configural invariance was preferred, depending on whether AIC, BIC, or the significance test were considered. (see Table \@ref(tab:miagetab)). 
 
 ```{r migendertab, echo=FALSE}
 mi_gender_compout=read.csv("mi_gender_compout.csv")
@@ -360,25 +362,48 @@ knitr::kable(mi_age_compout, caption = "Model comparison for measurement invaria
 
 Looking at modification indices of the weak invariance models for age and gender, I found that the suggested modifications for the gender model included allowing factor loadings for items Q1 and Q5 on the latent factors $\xi_1$ and $\xi_2$, respectively, to differ between groups, while for the age model, freeing factor loadings for item Q1, Q5, and Q10 between groups was suggested. This is roughly in agreement with what I found with respect to DIF (see above).
 
+\newpage
+
 # Theoretical Part: Key differences between IRT and CTT
+
 ## Introduction
 
 Unlike some physical quantities, many of the variables of interest in psychology, economics, and other human-centric fields, are latent, i.e., not directly observable. Researchers often try to reconstruct such latent variables by combining several observable variables. In particular, for psychological concepts such as personality traits, a person's score will often be estimated as a combination of item responses in a psychological test. Even though forerunners of psychological tests have been around for centuries, a comprehensive theory of psychological testing only emerged roughly half a century ago. Commonly, Melvin Novick is considered the first author to present a comprehensive account of Classical Test Theory (CTT) (@novick1965axioms). Around the same time, a probabilistic view of psychological testing began to emerge, which are now referred to as Item Response Theory (IRT) (@rasch1960studies). It is interesting to note that *Classical* Test Theory does, therefore, not refer to the theory itself being older, but that it rather describes the 'classical' way authors thought about psychological testing from the early $20^{th}$ century onward, whereas probabilistic approaches became popular only later, when increasing computational capacity made them practical. In the following, I will describe some of the core ideas underlying CTT and ITT, their respective strengths and limitations, and practical applications. 
 
 ## Core Ideas and Terminology
-A test in the sense the CTT as well as IRT use the term is designed to measure a defined *trait* or *state* of a unit (often a person). The trait/state itself is assumed to be unobservable and is captured by combining several *items* that are thought to be reflective of the trait/state. Items in the test-theoretic sense have defined response categories, which can be either dichotomous (e.g., yes/no or solved/unsolved), or ordered (e.g. I... do not agree / agree a little / fully agree), or multinomial (e.g. my favorite color is... red/blue/green). Multinomial items where the responses can not be ordered, nor dichotomized (e.g., into correct and wrong) are more involved from a theoretical point of view and will not be further discussed here. In the end, all items of a test are usually combined by a linear function, i.e., a weighted sum, to form the test *score*. 
+A test, in the sense CTT as well as IRT use the term, is designed to measure a defined *trait* or *state* of a unit (often a person). The trait/state itself is assumed to be unobservable and is captured by combining several *items* that are thought to be reflective of the trait/state. Items in the test-theoretic sense have defined response categories, which can be either dichotomous (e.g., yes/no or solved/unsolved), or ordered (e.g. I... do not agree / agree a little / fully agree), or multinomial (e.g. my favorite color is... red/blue/green). Multinomial items where the responses can not be ordered, nor dichotomized (e.g., into correct and wrong) are more involved from a theoretical point of view and will not be further discussed here. In the end, all items of a test are usually combined by a linear function, i.e., a weighted sum, to form the test *score*. Any theory of psychological tests is concerned with how test scores come about and how they relate to the actual quantity that the test is supposed to measure.
 
-### CTT
-The traditional view of psychological tests (Classical Test Theory, CTT) conceived a given person's total score across all items of a test as an additive combination of the person's true score and a testing error: $X_i = \tau_i + \epsilon_i$ (@linden1997item). (@crocker2008introduction)
-Reliability, Consistency, Discrimination, Difficulty
+Tests are described by their *Objectivity*, *Reliability*, and *Validity*. Objectivity is concerned with independence of the test result from the person that administers the test. Reliability means consistency or reproducibility of results, and validity refers to the test being valid, i.e., actually measuring the state or trait it is supposed to measure.
 
-### IRT
+Single items within a test, on the other hand, can be described by their *difficulty* and *discrimination*. Item difficulty is related to the proportion of examinees that solve the item, where *solving* can actually mean to give the correct response if a correct response exists, or could otherwise mean responding 'yes' to a question or responding above a defined threshold if there are more than two response options.
 
-## Strenghts
+The above terms exist, conceptually, in IRT and CTT alike, even though their mathematical formulation might differ.In the following, I will describe how some of them are defined in CTT and IRT, respectively, and how they are linked to underlying theoretical concepts.
 
-## Limitations
+## Assumptions and Problems of CTT
+At the heart of CTT is the so-called classical true score model. It states that a given person's test score is an additive combination of the person's *true score* and the *test error*: $X_i = \tau_i + \epsilon_i$. The true score is defined (!) as the expected value $\mathbb{E}X_i$. As a corollary, for the error it holds that $\mathbb{E}\epsilon_i = 0$. CTT assumes that true scores and test errors are uncorrelated within the same test and across tests (the true score of any test is uncorrelated with the error of any other test), and that test errors for the same person across several repetitions of the same test or across different tests are uncorrelated, that is to say, the test is assumed to be equally accurate regardless of the specific examinee and regardless of whether the examinee has a high or low true score (@crocker2008introduction).
+
+Taken together, those assumptions amount to the tenet that the variable of interest is represented by the test scores in an unbiased way, and that only unsystematic test errors prevent tests from representing it perfectly. 
+
+While this theory obviously has some shortcomings, which I will discuss below, it also has advantages. With the above assumptions in place, calculating test-retest reliability, internal consistency, or interrater reliability are straightforward and essentially only require calculating correlations between test scores. Test scores can easily be corrected for reliability-related attenuation, and also item-level characteristics such as difficulty and discrimination can easily be calculated as arithmetic means of responses and correlations between item responses and test scores, respectively. Overall, CTT provides a simple theoretical framework that can prove useful in practice.
+
+However, as mentioned, CTT comes with several downsides. First, it is primarily a theory of test errors, while it only has a very simple notion of how the 'true score' is related to the examinee's actual state/trait and to the single items that the test is made up of. The assumptions of uncorrelated errors are restrictive, since it does not appear plausible that tests are equally accurate irrespective of whether the examinee has a high or low value on the quantity of interest. Finally, CTT provides no method for considering test and person characteristics independently from each other (@linden1997item).
+
+## Strengths and Limitations of IRT 
+IRT has been designed to overcome some of the limitations of CTT. It provides a theory of individual *item responses*, rather than starting with the total test score. Moreover, IRT does not have a notion of test errors. Instead, responses to single items of a test are modeled as a *probabilistic* function of the difficulty of the item and the ability (latent trait/state) of the examinee, the so-called *item response function*. If a person with low ability solves an item with high difficulty, this is not thought of as an *error* within IRT, but rather as a less likely, yet not impossible, realization of a random variable. Both item difficulties and person abilities are unknown a priori and are estimated from data using a probabilistic (often logistic) model, as described in more detail in the practical section.
+
+IRT is, overall, a more flexible framework to characterize tests than CTT. For instance, it does not assume tests to be equally accurate for low- and high-ability persons. Rather, the logistic function comes with a natural saturation property that can model items to have different sensitivity to different ability levels. Graphically, this becomes apparent when looking at ICCs (see above) (@crocker2008introduction).
+
+The key difference between CTT and IRT is that IRT explicitly formulates a testable latent variable model that explains the relationship between person abilities and item properties, while CTT simply assumes a linear link between item responses and person abilities (test scores), without providing a proper means to test this assumption. Whithin IRT, the question of whether items can be summed up, i.e., whether items are independent of each other with respect to person ability, and whether the test is unidimensional, can be explicitly tested. Moreover, the item coefficients of an IRT model are, at least in theory, sample-independent, in contrast to CTT.
+
+The notions of reliability, item difficulty, and item discrimination are also defined within the latent variable model in IRT, rather than being calculated from the sample data. Reliability is usually tested in terms of unidimensionality of a factor model, i.e., whether item responses can well be explained by a single underlying latent factor. Item difficulty and discrimination, on the other hand, can be directly read off from the latent variable model. Item difficulty describes the item threshold, i.e., the level of person ability necessary to have a 50% chance of solving an item. Item discrimination, on the other hand, is fixed to be equal across all items in the simplest case (the Rasch model) and is a free parameter only in higher-parameterized models such as the Birnbaum model. It can be thought of as an item's sensitivity to changes in person ability. Graphically, it appears as the slope of the ICC in its steepest point.
+
+The greater flexibility of IRT models comes, on the other hand, with greater responsibility on the part of the human user. IRT models are undoubtedly more difficult to understand and operate, and require more choices (e.g., should a Rasch model with one free parameter, a Birnbaum model with two free parameters, or an even more complex model be used?). Moreover, IRT models come with a set of assumptions about the item response data in order to describe the test appropriately. Assumptions of IRT are, in particular, local independence of items, i.e., mutual conditional independence of item responses given the person ability score, and unidimensionality of the test, and an item response structure that can be described by the item response function, in particular, a monotonic relationship between person ability and probability to solve the item (@crocker2008introduction). 
 
 ## Conclusion and Application
+I have briefly outlined key tenets, strengths and limitations of CTT, and how IRT attempts to overcome those limitations. Simultaneously a strength and a limitation of CTT is its simplicity, as it does not rely on any latent variable modeling and is rather easy to understand and apply. IRT, on the other hand, is the more complex theory, but it allows more flexibility and is, when properly applied, more informative about the test and the examinees.
+
+Methods from both theories, and combinations between them, have been successfully applied to construct and validate tests. It should be noted that both theories are, in and of themselves, insufficient for test construction and validation, since they primarily focus on reliability, and, to a lesser extent, objectivity issues. The question of test validity, on the other hand, is arguably the most important quality of a test, but there is no purely mathematical way to describe or ascertain validity - rather, it must be derived from, and validated by, theory, observation, and sometimes intuition.
+
 
 \newpage
 

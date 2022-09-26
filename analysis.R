@@ -20,7 +20,12 @@ library(semTools)
 #part 1: data preparation, descriptive analyses
 #####
 {
+   
 df = read_xlsx("SCS_data.xlsx")
+#df = read_xlsx("data.csv")
+#if data have been re-downloaded from 
+#openpsychometrics, uncomment the above line
+
 SCS_vars = names(df)[1:10]
 #set missing values
 print(table(df$gender))
@@ -377,12 +382,12 @@ dich$score = rowSums(dich[,1:10])
                                    difficulty=as.numeric(difficulties_2PL)),
                         data.frame(model="CTT",
                                    item=factor(SCS_vars),
-                                   difficulty=as.numeric(dich.distro[1,])/100))
+                                   difficulty=1-as.numeric(dich.distro[1,])/100))
   ggplot(difficulties_1vs2PL,aes(x=item,y=difficulty,
                                                      color=model,group=model)) + 
     geom_point() + geom_line() + theme_clean() + ggtitle("model comparison")+
     scale_x_discrete(breaks=SCS_vars,limits=SCS_vars)
-  ggsave("difficulties_plot_2PL.pdf",width = 4,height = 3)
+  ggsave("difficulties_plot_2PL.pdf",width = 6,height = 4)
   
   
   #calculate item-wise infit and outfit
